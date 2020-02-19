@@ -136,8 +136,7 @@ EndProcedure
 
 ; Процедура проверки наличия и ожидания окон VIVALDI
 Procedure VivaldiWndEnumWait()
-    Protected counter
-    counter=0
+    Protected counter=0
     Repeat    
         If WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")=0
             counter=counter+1
@@ -149,6 +148,22 @@ Procedure VivaldiWndEnumWait()
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
+EndProcedure
+
+; Процедура перехода на страницу из буфера обмена
+Procedure VivaldiClipboardAddress(Address.s)
+    Protected ClipboardText.s
+    ClipboardText=GetClipboardText()
+    SetClipboardText(Address)
+    keybd_event_(17 , 0, 0, 0)
+    keybd_event_(16 , 0, 0, 0)
+    keybd_event_(86 , 0, 0, 0)
+    Delay(70)
+    keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
+    keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
+    keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+    SetClipboardText(ClipboardText)
+    ClipboardText=""
 EndProcedure
 
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
@@ -177,17 +192,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             EndIf
             If CountKodeKey=1 And Val(VirtKeyCode(0))=0
                 ; Реализация рестарта VIVALDI
-                ClipboardText=GetClipboardText()
-                SetClipboardText("vivaldi://restart")
-                keybd_event_(17 , 0, 0, 0)
-                keybd_event_(16 , 0, 0, 0)
-                keybd_event_(86 , 0, 0, 0)
-                Delay(70)
-                keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                SetClipboardText(ClipboardText)
-                ClipboardText=""
+                VivaldiClipboardAddress("vivaldi://restart")
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=7
                 ; Открыть DevTools для интерфейса VIVALDI 
                 ClipboardText=GetClipboardText()
@@ -221,6 +226,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
                 SetClipboardText(ClipboardText)
                 ClipboardText=""
+            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
+                ; Переход на стартовую страницу VIVALDI в текущей вкладке
+                VivaldiClipboardAddress("vivaldi://startpage")
             EndIf
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
@@ -271,8 +279,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 247
-; FirstLine = 87
-; Folding = A0
+; CursorPosition = 156
+; FirstLine = 120
+; Folding = g8
 ; EnableXP
 ; CompileSourceDirectory

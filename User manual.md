@@ -4,6 +4,8 @@ Author: kichrot
 
 2020 y.
 
+This Manual was created in the LibreOffice package.
+
 This Manual has been translated into English from the original in Russian using a translator at: [https://translate.yandex.ru/](https://translate.yandex.ru/)
 
 
@@ -34,7 +36,9 @@ Appendix 1. Virtual key codes.
 
 Appendix 2. PCRE library license
 
-## I. Purpose of the &quot;Vivaldi\_Run&quot; program.
+
+
+I. Purpose of the &quot;Vivaldi\_Run&quot; program.
 
 1) Launch the &quot;VIVALDI&quot; browser with the command-line parameters set by the user in the &quot;VIVALDI\_COMMAND\_LINE.txt&quot;.
 
@@ -44,7 +48,7 @@ Providing the functionality of the buttons created by the user, the program &quo
 
 
 
-## II. The composition of the &quot;Vivaldi\_Run&quot; program delivery and the purpose of the files.
+II. The composition of the &quot;Vivaldi\_Run&quot; program delivery and the purpose of the files.
 
 The software package includes the following files and directories:
 
@@ -52,11 +56,13 @@ The software package includes the following files and directories:
 
 2) the file &quot;VIVALDI\_COMMAND\_LINE.txt &quot; - a file containing command-line parameters for launching the &quot;VIVALDI&quot; browser. By default, the file is empty and filled in by the user, according to their needs.
 
-3) files &quot;–уководство пользовател€.doc&quot; and &quot;User manual.doc&quot; - files containing this Manual, respectively in Russian and English.
+3) files &quot;–уководство пользовател€.rtf&quot; and &quot;User manual.rtf&quot; - files containing this Manual, respectively in Russian and English.
 
 4) the &quot;JS MOD&quot; directory - the directory with the &quot;New\_button.js &quot; containing an example of a JavaScript mod that creates the necessary buttons for the user on the &quot;VIVALDI&quot; browser panels.
 
-_5) &quot;source&quot; directory - the directory with the source code files of the program &quot;Vivaldi\_Run&quot; in the programming language &quot;Purebasic 5.70&quot; (_[_https://www.purebasic.com/_](https://www.purebasic.com/)_) using the PCRE library. For the PCRE library license, see Appendix 2 of this Guide._
+5) &quot;source&quot; directory - the directory with the source code files of the program &quot;Vivaldi\_Run&quot; in the programming language &quot;Purebasic 5.70&quot; ([https://www.purebasic.com/](https://www.purebasic.com/)) using the PCRE library. For the PCRE library license, see Appendix 2 of this Guide.
+
+
 
 III. Description of the main algorithm of the program &quot;Vivaldi\_Run&quot;
 
@@ -96,7 +102,7 @@ When you try to run the second instance of the &quot;Vivaldi\_Run&quot; program,
 
 
 
-## IV. Installation and preparation for work programme &quot;Vivaldi\_Run&quot;.
+IV. Installation and preparation for work programme &quot;Vivaldi\_Run&quot;.
 
 1) unpack the archive with the program &quot;Vivaldi\_Run&quot; in a separate directory.
 
@@ -134,11 +140,11 @@ After performing these actions, the &quot;Vivaldi\_Run&quot; program is ready to
 
 
 
-## V. Preparing the &quot;VIVALDI&quot; browser to work with the &quot;Vivaldi\_Run&quot; program.
+V. Preparing the &quot;VIVALDI&quot; browser to work with the &quot;Vivaldi\_Run&quot; program.
 
 Preparing the &quot;VIVALDI&quot; browser to work with the &quot;Vivaldi\_Run&quot; program consists in preparing and connecting the corresponding JavaScript mod to the browser.
 
-An example of the mod is included in the delivery of the program &quot;Vivaldi\_Run&quot;, in the form of the file &quot; New\_button.js&quot; in the &quot;JS MOD&quot; directory. The mod&#39;s composition is discussed in section **VI** of this Guide.
+An example of the mod is included in the delivery of the program &quot;Vivaldi\_Run&quot;, in the form of the file &quot; New\_button.js&quot; in the &quot;JS MOD&quot; directory. The mod&#39;s composition is discussed in section VI of this Guide.
 
 1) open the &quot;New\_button.js&quot; file in any text editor from the &quot;JS MOD&quot; directory.
 
@@ -164,77 +170,75 @@ JS-mod, presented in the file &quot;New\_button.js&quot; is written in JavaScrip
 
 An example of a JS mod presented in the &quot;New\_button&quot; file.js&quot;, contains unchanging part (highlighted in red font) and a modifiable  part (highlighted in green font):
 
-
-
 /\* ћод дл€ браузера VIVALDI / Mod for the VIVALDI browser
 
-** **** \* —оздание новых кнопок / Create new buttons**
+ \* —оздание новых кнопок / Create new buttons
 
-** **** \* автор: kichrot / author: kichrot**
+ \* автор: kichrot / author: kichrot
 
-** **** \* 2020 г. / 2020 year**
+ \* 2020 г. / 2020 year
 
-** **** \* »спользуетс€ совместно с утилитой &quot;Vivaldi\_RUN&quot; / Used in conjunction with the &quot;Vivaldi\_run&quot; utility.**
+ \* »спользуетс€ совместно с утилитой &quot;Vivaldi\_RUN&quot; / Used in conjunction with the &quot;Vivaldi\_run&quot; utility.
 
-** **** \*/**
+ \*/
 
 ////////////////////////////////////////////////////////////////////  Ќеизмен€ема€ часть / The unchanging part  ///////////////////////////////////////////////////////////////////////
 
 function CreateNewButton(KEYPRESS\_NewButton, classNewButton, toolbarNewButton, titleNewButton, svgNewButton) {
 
-** ****         function openClick() {**
+         function openClick() {
 
-** ****                 var OLD\_title = document.title;**
+                 var OLD\_title = document.title;
 
-**   **  **        document.title = &#39;VIVALDI\_EMULATE\_KEYPRESS &#39; + KEYPRESS\_NewButton;**
+            document.title = &#39;VIVALDI\_EMULATE\_KEYPRESS &#39; + KEYPRESS\_NewButton;
 
-**   ** **        setTimeout(**
+            setTimeout(
 
-** ** **                                () =\&gt; {**
+                                  () =\&gt; {
 
-**   **  **                                document.title = OLD\_title;**
+                                    document.title = OLD\_title;
 
-** ** **                                }, 50);**
+                                  }, 50);
 
-**   **  **}**
+    }
 
-**   ** **function NewButton () {**
+    function NewButton () {
 
-**       ** **var toolbar = document.querySelector(toolbarNewButton);**
+        var toolbar = document.querySelector(toolbarNewButton);
 
-**       ** **var outer\_div = document.createElement(&#39;div&#39;);**
+        var outer\_div = document.createElement(&#39;div&#39;);
 
-**       ** **outer\_div.classList.add(&#39;button-toolbar&#39;, classNewButton);**
+        outer\_div.classList.add(&#39;button-toolbar&#39;, classNewButton);
 
-**       **  **outer\_div.title = titleNewButton;**
+        outer\_div.title = titleNewButton;
 
-**       ** **var button = document.createElement(&#39;button&#39;);**
+        var button = document.createElement(&#39;button&#39;);
 
-**       **  **button.onclick = openClick;**
+        button.onclick = openClick;
 
-**       **  **button.innerHTML = svgNewButton;**
+        button.innerHTML = svgNewButton;
 
-**       ** **outer\_div.appendChild(button);**
+        outer\_div.appendChild(button);
 
-**       ** **toolbar.appendChild(outer\_div);**
+        toolbar.appendChild(outer\_div);
 
-**   **  **}**
+    }
 
-**   ** **setTimeout(function wait() {**
+    setTimeout(function wait() {
 
-**       ** **var toolbar = document.querySelector(toolbarNewButton);**
+        var toolbar = document.querySelector(toolbarNewButton);
 
-**       ** **if (toolbar) {**
+        if (toolbar) {
 
-**           **** NewButton();**
+           NewButton();
 
-**       **  **} else {**
+        } else {
 
-**           ** **setTimeout(wait, 300);**
+            setTimeout(wait, 300);
 
-**       **  **}**
+        }
 
-**   ** **}, 300);**
+    }, 300);
 
 }
 
@@ -253,6 +257,20 @@ var NewButtonToolbar = &#39;.toolbar-addressbar.toolbar \&gt; .toolbar.toolbar-d
 var NewButtonTitle = &#39;ќчистка данных браузера / Clearing browser data&#39;;
 
 var NewButtonSvg = &#39;\&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;chocolate&quot;\&gt;\&lt;path d=&quot;M18.58 0c-1.234 0-2.377.616-3.056 1.649-.897 1.37-.854 3.261-1.368 4.444-.741 1.708-3.873.343-5.532-.524-2.909 5.647-5.025 8.211-6.845 10.448 6.579 4.318 1.823 1.193 12.19 7.983 2.075-3.991 4.334-7.367 6.825-10.46-1.539-1.241-4.019-3.546-2.614-4.945 1-1 2.545-1.578 3.442-2.95 1.589-2.426-.174-5.645-3.042-5.645zm-5.348 21.138l-1.201-.763c0-.656.157-1.298.422-1.874-.609.202-1.074.482-1.618 1.043l-3.355-2.231c.531-.703.934-1.55.859-2.688-.482.824-1.521 1.621-2.331 1.745l-1.302-.815c1.136-1.467 2.241-3.086 3.257-4.728l8.299 5.462c-1.099 1.614-2.197 3.363-3.03 4.849zm6.724-16.584c-.457.7-2.445 1.894-3.184 2.632-.681.68-1.014 1.561-.961 2.548.071 1.354.852 2.781 2.218 4.085-.201.265-.408.543-.618.833l-8.428-5.548.504-.883c1.065.445 2.1.678 3.032.678 1.646 0 2.908-.733 3.464-2.012.459-1.058.751-3.448 1.206-4.145 1.206-1.833 3.964-.017 2.767 1.812zm-.644-.424c-.265.41-.813.523-1.22.257-.409-.267-.522-.814-.255-1.223.267-.409.813-.524 1.222-.257.408.266.521.817.253 1.223z&quot;/\&gt;\&lt;/svg\&gt;&#39;;
+
+CreateNewButton(NewButton\_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
+
+/\*  нопка переход на Ёкспресс-панель / The go to button on the speed dial \*/
+
+var NewButton\_KEYPRESS = &#39;&quot;10&quot;&#39;;
+
+var NewButtonClass = &#39;mod-open-startpage&#39;;
+
+var NewButtonToolbar = &#39;.toolbar-addressbar.toolbar \&gt; .toolbar.toolbar-droptarget.toolbar-mainbar&#39;;
+
+var NewButtonTitle = &#39;ѕерейти на Ёкспресс-панель&#39;;
+
+var NewButtonSvg = &#39;\&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;mediumvioletred&quot;\&gt;\&lt;path d=&quot;M20 19h-4v-4h4v4zm-6-10h-4v4h4v-4zm6 0h-4v4h4v-4zm-12 6h-4v4h4v-4zm16-14v22h-24v-22h24zm-2 6h-20v14h20v-14zm-8 8h-4v4h4v-4zm-6-6h-4v4h4v-4z&quot;/\&gt;\&lt;/svg\&gt;&#39;;
 
 CreateNewButton(NewButton\_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
@@ -340,59 +358,59 @@ var NewButtonSvg = &#39;\&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; wi
 
 CreateNewButton(NewButton\_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
-_The mod&#39;s unchanging part is_ _a_ _JavaScript function that creates buttons with parameters set by the user in the mod&#39;s modifiable part._
+The mod&#39;s unchanging part is a JavaScript function that creates buttons with parameters set by the user in the mod&#39;s modifiable part.
 
-_The modifiable part of the mod consists of a set of parameter values set by the user and a call to the button creation function with these parameters for each created button._
+The modifiable part of the mod consists of a set of parameter values set by the user and a call to the button creation function with these parameters for each created button.
 
-_ **Composition and assignment of parameters for created buttons:** _
+Composition and assignment of parameters for created buttons:
 
-_1._ _ **New Button\_KEYPRESS** _ _variable Ч codes of virtual keys, in decimal format, that correspond to keys from the keyboard shortcut, for calling the desired browser function &quot;VIVALDI&quot;. Virtual key codes, in decimal format, can be taken from the table in Appendix 1 to this Manual, from the column_ _**&quot;Value (decimal)&quot;**__. Each virtual key code must be enclosed in double quotes, with a space between the codes. All code combinations must be enclosed in single quotes._
+1. New Button\_KEYPRESS variable Ч codes of virtual keys, in decimal format, that correspond to keys from the keyboard shortcut, for calling the desired browser function &quot;VIVALDI&quot;. Virtual key codes, in decimal format, can be taken from the table in Appendix 1 to this Manual, from the column &quot;Value (decimal)&quot;. Each virtual key code must be enclosed in double quotes, with a space between the codes. All code combinations must be enclosed in single quotes.
 
-_Example:_
+Example:
 
-_ **var NewButton\_KEYPRESS =&#39; &quot;17&quot; &quot;16&quot; &quot;46&quot; &#39;** _
+var NewButton\_KEYPRESS =&#39; &quot;17&quot; &quot;16&quot; &quot;46&quot; &#39;
 
-_In this example, the parameter value is set for the button that is being created_ _ **NewButton\_KEYPRESS** __, corresponding to the keyboard shortcut Ctrl+Shift+DELETE, which displays the &quot;Delete browsing data&quot; panel in the browser._
+In this example, the parameter value is set for the button that is being created NewButton\_KEYPRESS, corresponding to the keyboard shortcut Ctrl+Shift+DELETE, which displays the &quot;Delete browsing data&quot; panel in the browser.
 
-_2. The_ _ **NewButtonClass** _ _variable is the name of the class of the button being created. The class name must be unique for your &quot;VIVALDI&quot; browser instance._
+2. The NewButtonClass variable is the name of the class of the button being created. The class name must be unique for your &quot;VIVALDI&quot; browser instance.
 
-_Example:_
+Example:
 
-_ **var NewButtonClass = &#39;mod-clear-histori&#39;** _
+var NewButtonClass = &#39;mod-clear-histori&#39;
 
-_In this example, the parameter value is set for the button that is being created   __**NewButtonClass**__ , specifies a unique class name._
+In this example, the parameter value is set for the button that is being created  NewButtonClass, specifies a unique class name.
 
-_3._ _Variable   __**NewButtonToolbar -**__ ID of the &quot;VIVALDI&quot; browser panel where the created button will be placed. The ID of the &quot;VIVALDI&quot; browser panel you need can be found using the DevTools tool that is included with the &quot;VIVALDI&quot; browser._
+3. Variable  NewButtonToolbar -ID of the &quot;VIVALDI&quot; browser panel where the created button will be placed. The ID of the &quot;VIVALDI&quot; browser panel you need can be found using the DevTools tool that is included with the &quot;VIVALDI&quot; browser.
 
-_Example:_
+Example:
 
-_ **var NewButtonToolbar =&#39;.toolbar-addressbar.toolbar \&gt; .toolbar.toolbar-droptarget.toolbar-mainbar&#39;** _
+var NewButtonToolbar =&#39;.toolbar-addressbar.toolbar \&gt; .toolbar.toolbar-droptarget.toolbar-mainbar&#39;
 
-_In this example, the parameter value is set for the button that is being created   __**NewButtonToolbar**__ ,  specifies the ID of the navigation buttons panel located to the left of the address bar, where the created button will be located._
+In this example, the parameter value is set for the button that is being created  NewButtonToolbar,  specifies the ID of the navigation buttons panel located to the left of the address bar, where the created button will be located.
 
-_4. Variable_ _ **NewButtonTitle -** _ _tooltip for the button that is being created that appears when the mouse pointer is hovering over the button._
+4. Variable NewButtonTitle - tooltip for the button that is being created that appears when the mouse pointer is hovering over the button.
 
-_Example:_
+Example:
 
-_ **var NewButtonTitle = &#39;Clearing browser data&#39;** _
+var NewButtonTitle = &#39;Clearing browser data&#39;
 
-_In this example, the parameter value is set for the button that is being created   __**NewButtonTitle**__ , sets the hint text._
+In this example, the parameter value is set for the button that is being created  NewButtonTitle, sets the hint text.
 
-_5. Variable_ _ **NewButtonSvg** _ _Ч SVG code of the icon on the created button. Collections of SVG icon codes can be found on the Internet. One of the best sites is:_ [_https://iconmonstr.com/_](https://iconmonstr.com/)
+5. Variable NewButtonSvg Ч SVG code of the icon on the created button. Collections of SVG icon codes can be found on the Internet. One of the best sites is: [https://iconmonstr.com/](https://iconmonstr.com/)
 
-_Example:_
+Example:
 
-_ **var NewButtonSvg = &#39;\&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;red&quot;\&gt;\&lt;path d=&quot;M14 12h-4v-12h4v12zm4.213-10.246l-1.213 1.599c2.984 1.732 5 4.955 5 8.647 0 5.514-4.486 10-10 10s-10-4.486-10-10c0-1.915.553-3.694 1.496-5.211l2.166 2.167 1.353-7.014-7.015 1.35 2.042 2.042c-1.287 1.904-2.042 4.193-2.042 6.666 0 6.627 5.373 12 12 12s12-5.373 12-12c0-4.349-2.322-8.143-5.787-10.246z&quot;/\&gt;\&lt;/svg\&gt;&#39;;** _
+var NewButtonSvg = &#39;\&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;red&quot;\&gt;\&lt;path d=&quot;M14 12h-4v-12h4v12zm4.213-10.246l-1.213 1.599c2.984 1.732 5 4.955 5 8.647 0 5.514-4.486 10-10 10s-10-4.486-10-10c0-1.915.553-3.694 1.496-5.211l2.166 2.167 1.353-7.014-7.015 1.35 2.042 2.042c-1.287 1.904-2.042 4.193-2.042 6.666 0 6.627 5.373 12 12 12s12-5.373 12-12c0-4.349-2.322-8.143-5.787-10.246z&quot;/\&gt;\&lt;/svg\&gt;&#39;;
 
-_In this example, the value of the_ _ **NewButtonSvg** _ _parameter that specifies the icon&#39;s SVG code is set for the button that is being created._
+In this example, the value of the NewButtonSvg parameter that specifies the icon&#39;s SVG code is set for the button that is being created.
 
-_ **The function call to create a new button:** _
+The function call to create a new button:
 
-_After setting the values of the parameters of the created button, it is necessary to call the function for creating a new button, which has a standard appearance in the considered JS-mode, and does not require editing by the user._
+After setting the values of the parameters of the created button, it is necessary to call the function for creating a new button, which has a standard appearance in the considered JS-mode, and does not require editing by the user.
 
-_ѕример:_
+ѕример:
 
-_**CreateNewButton(NewButton\_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);**_
+CreateNewButton(NewButton\_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
 
 
@@ -404,31 +422,55 @@ The author conditionally divides the buttons implemented using the program &quot
 
 &quot;Non-standard&quot; buttons are buttons that send commands to the &quot;Vivaldi\_Run&quot; program to emulate keyboard shortcuts and other actions that cannot be registered in the &quot;VIVALDI&quot; browser for various reasons.
 
-For each &quot;non-standard&quot; button, the author assigned a parameter value _ **NewButton\_KEYPRESS** _, which is not subject to change.
+For each &quot;non-standard&quot; button, the author assigned a parameter value NewButton\_KEYPRESS, which is not subject to change.
 
 The current version of the Vivaldi\_Run program provides functionality for the following &quot;non-standard&quot; buttons:
 
 1) the reload button of the browser &quot;VIVALDI&quot;.
 
-The assigned value _ **NewButton\_KEYPRESS=&#39; &quot;0&quot; &#39;** _
+The assigned value NewButton\_KEYPRESS=&#39; &quot;0&quot; &#39;
 
 2) button to open the &quot;DevTools&quot; developer tool window for the &quot;VIVALDI&quot; browser interface.
 
-The assigned value _ **NewButton\_KEYPRESS=&#39; &quot;0** __**7**__ **&quot; &#39;** _
+The assigned value NewButton\_KEYPRESS=&#39; &quot;07&quot; &#39;
 
-_ **ATTENTION!** _
+3) button transition&#39;s on the Express-panel in the current tab
 
-_ **To ensure the functioning of &quot;non-standard&quot; buttons, you cannot change the keyboard shortcuts for the following functions in the &quot;VIVALDI&quot; browser:** _
+Appointed value NewButton\_KEYPRESS=&#39; &quot;10&quot; &#39;
 
-_ **- Insert and go** _
+ATTENTION!
 
-_ **- New tab** _
+To ensure the functioning of &quot;non-standard&quot; buttons, you cannot change the keyboard shortcuts for the following functions in the &quot;VIVALDI&quot; browser:
 
-_ **- Close the tab** _
+- Insert and go
+
+- New tab
+
+- Close the tab
 
 
 
-_ **Appendix 1** _
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Appendix 1
 
 # Virtual key codes.
 
@@ -440,8 +482,8 @@ The following table shows the character names of constants, decimal values, and 
 | VK\_RBUTTON | 2 | Right mouse button |
 | VK\_CANCEL | 3 | Control-break processing |
 | VK\_MBUTTON | 4 | Middle mouse button (three-button mouse) |
-| VK\_XBUTTON1 | 5 | **Windows 2000:**  X1 mouse button |
-| VK\_XBUTTON2 | 6 | **Windows 2000:**  X2 mouse button |
+| VK\_XBUTTON1 | 5 | Windows 2000: X1 mouse button |
+| VK\_XBUTTON2 | 6 | Windows 2000: X2 mouse button |
 | Ч | 7 | Undefined |
 | VK\_BACK | 8 | BACKSPACE key |
 | VK\_TAB | 9 | TAB key |
@@ -455,7 +497,7 @@ The following table shows the character names of constants, decimal values, and 
 | VK\_PAUSE | 19 | PAUSE key |
 | VK\_CAPITAL | 20 | CAPS LOCK key |
 | VK\_KANA | 21 | IME Kana mode |
-| VK\_HANGUEL | 21 | IME Hanguel mode (maintained for compatibility; use  **VK\_HANGUL** ) |
+| VK\_HANGUEL | 21 | IME Hanguel mode (maintained for compatibility; use VK\_HANGUL) |
 | VK\_HANGUL | 21 | IME Hangul mode |
 | Ч | 22 | Undefined |
 | VK\_JUNJA | 23 | IME Junja mode |
@@ -577,46 +619,46 @@ The following table shows the character names of constants, decimal values, and 
 | VK\_RCONTROL | 163 | Right CONTROL key |
 | VK\_LMENU | 164 | Left MENU key |
 | VK\_RMENU | 165 | Right MENU key |
-| VK\_BROWSER\_BACK | 166 | **Windows 2000:**  Browser Back key |
-| VK\_BROWSER\_FORWARD | 167 | **Windows 2000:**  Browser Forward key |
-| VK\_BROWSER\_REFRESH | 168 | **Windows 2000:**  Browser Refresh key |
-| VK\_BROWSER\_STOP | 169 | **Windows 2000:**  Browser Stop key |
-| VK\_BROWSER\_SEARCH | 170 | **Windows 2000:**  Browser Search key |
-| VK\_BROWSER\_FAVORITES | 171 | **Windows 2000:**  Browser Favorites key |
-| VK\_BROWSER\_HOME | 172 | **Windows 2000:**  Browser Start and Home key |
-| VK\_VOLUME\_MUTE | 173 | **Windows 2000:**  Volume Mute key |
-| VK\_VOLUME\_DOWN | 174 | **Windows 2000:**  Volume Down key |
-| VK\_VOLUME\_UP | 175 | **Windows 2000:**  Volume Up key |
-| VK\_MEDIA\_NEXT\_TRACK | 176 | **Windows 2000:**  Next Track key |
-| VK\_MEDIA\_PREV\_TRACK | 177 | **Windows 2000:**  Previous Track key |
-| VK\_MEDIA\_STOP | 178 | **Windows 2000:**  Stop Media key |
-| VK\_MEDIA\_PLAY\_PAUSE | 179 | **Windows 2000:**  Play/Pause Media key |
-| VK\_LAUNCH\_MAIL | 180 | **Windows 2000:**  Start Mail key |
-| VK\_LAUNCH\_MEDIA\_SELECT | 181 | **Windows 2000:**  Select Media key |
-| VK\_LAUNCH\_APP1 | 182 | **Windows 2000:**  Start Application 1 key |
-| VK\_LAUNCH\_APP2 | 183 | **Windows 2000:**  Start Application 2 key |
+| VK\_BROWSER\_BACK | 166 | Windows 2000: Browser Back key |
+| VK\_BROWSER\_FORWARD | 167 | Windows 2000: Browser Forward key |
+| VK\_BROWSER\_REFRESH | 168 | Windows 2000: Browser Refresh key |
+| VK\_BROWSER\_STOP | 169 | Windows 2000: Browser Stop key |
+| VK\_BROWSER\_SEARCH | 170 | Windows 2000: Browser Search key |
+| VK\_BROWSER\_FAVORITES | 171 | Windows 2000: Browser Favorites key |
+| VK\_BROWSER\_HOME | 172 | Windows 2000: Browser Start and Home key |
+| VK\_VOLUME\_MUTE | 173 | Windows 2000: Volume Mute key |
+| VK\_VOLUME\_DOWN | 174 | Windows 2000: Volume Down key |
+| VK\_VOLUME\_UP | 175 | Windows 2000: Volume Up key |
+| VK\_MEDIA\_NEXT\_TRACK | 176 | Windows 2000: Next Track key |
+| VK\_MEDIA\_PREV\_TRACK | 177 | Windows 2000: Previous Track key |
+| VK\_MEDIA\_STOP | 178 | Windows 2000: Stop Media key |
+| VK\_MEDIA\_PLAY\_PAUSE | 179 | Windows 2000: Play/Pause Media key |
+| VK\_LAUNCH\_MAIL | 180 | Windows 2000: Start Mail key |
+| VK\_LAUNCH\_MEDIA\_SELECT | 181 | Windows 2000: Select Media key |
+| VK\_LAUNCH\_APP1 | 182 | Windows 2000: Start Application 1 key |
+| VK\_LAUNCH\_APP2 | 183 | Windows 2000: Start Application 2 key |
 | Ч | 184-185 | Reserved |
-| VK\_OEM\_1 | 186 | **Windows 2000:**  For the US standard keyboard, the &#39;;:&#39; key |
-| VK\_OEM\_PLUS | 187 | **Windows 2000:**  For any country/region, the &#39;+&#39; key |
-| VK\_OEM\_COMMA | 188 | **Windows 2000:**  For any country/region, the &#39;,&#39; key |
-| VK\_OEM\_MINUS | 189 | **Windows 2000:**  For any country/region, the &#39;-&#39; key |
-| VK\_OEM\_PERIOD | 190 | **Windows 2000:**  For any country/region, the &#39;.&#39; key |
-| VK\_OEM\_2 | 191 | **Windows 2000:**  For the US standard keyboard, the &#39;/?&#39; key |
-| VK\_OEM\_3 | 192 | **Windows 2000:**  For the US standard keyboard, the &#39;`~&#39; key |
+| VK\_OEM\_1 | 186 | Windows 2000: For the US standard keyboard, the &#39;;:&#39; key |
+| VK\_OEM\_PLUS | 187 | Windows 2000: For any country/region, the &#39;+&#39; key |
+| VK\_OEM\_COMMA | 188 | Windows 2000: For any country/region, the &#39;,&#39; key |
+| VK\_OEM\_MINUS | 189 | Windows 2000: For any country/region, the &#39;-&#39; key |
+| VK\_OEM\_PERIOD | 190 | Windows 2000: For any country/region, the &#39;.&#39; key |
+| VK\_OEM\_2 | 191 | Windows 2000: For the US standard keyboard, the &#39;/?&#39; key |
+| VK\_OEM\_3 | 192 | Windows 2000: For the US standard keyboard, the &#39;`~&#39; key |
 | Ч | 193Ц215 | Reserved |
 | Ч | 216Ц218 | Unassigned |
-| VK\_OEM\_4 | 219 | **Windows 2000:**  For the US standard keyboard, the &#39;[{&#39; key |
-| VK\_OEM\_5 | 220 | **Windows 2000:**  For the US standard keyboard, the &#39;\|&#39; key |
-| VK\_OEM\_6 | 221 | **Windows 2000:**  For the US standard keyboard, the &#39;]}&#39; key |
-| VK\_OEM\_7 | 222 | **Windows 2000:**  For the US standard keyboard, the &#39;single-quote/double-quote&#39; key |
+| VK\_OEM\_4 | 219 | Windows 2000: For the US standard keyboard, the &#39;[{&#39; key |
+| VK\_OEM\_5 | 220 | Windows 2000: For the US standard keyboard, the &#39;\|&#39; key |
+| VK\_OEM\_6 | 221 | Windows 2000: For the US standard keyboard, the &#39;]}&#39; key |
+| VK\_OEM\_7 | 222 | Windows 2000: For the US standard keyboard, the &#39;single-quote/double-quote&#39; key |
 | VK\_OEM\_8 | 223 |   |
 | Ч | 224 | Reserved |
 |   | 225 | OEM specific |
-| VK\_OEM\_102 | 226 | **Windows 2000:**  Either the angle bracket key or the backslash key on the RT 102-key keyboard |
+| VK\_OEM\_102 | 226 | Windows 2000: Either the angle bracket key or the backslash key on the RT 102-key keyboard |
 |   | 227Ц228 | OEM specific |
-| VK\_PROCESSKEY | 229 | **Windows 95/98, Windows NT 4.0, Windows 2000:**  IME PROCESS key |
+| VK\_PROCESSKEY | 229 | Windows 95/98, Windows NT 4.0, Windows 2000: IME PROCESS key |
 |   | 230 | OEM specific |
-| VK\_PACKET | 231 | **Windows 2000:**  Used to pass Unicode characters as if they were keystrokes. The VK\_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in  **KEYBDINPUT** ,  **SendInput** ,  **WM\_KEYDOWN** , and  **WM\_KEYUP** |
+| VK\_PACKET | 231 | Windows 2000: Used to pass Unicode characters as if they were keystrokes. The VK\_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT, SendInput, WM\_KEYDOWN, and WM\_KEYUP |
 | Ч | 232 | Unassigned |
 |   | 233Ц245 | OEM specific |
 | VK\_ATTN | 246 | Attn key |
@@ -655,7 +697,7 @@ The following table shows the character names of constants, decimal values, and 
 
 
 
-_ **Appendix 2** _
+Appendix 2
 
 PCRE library license
 
