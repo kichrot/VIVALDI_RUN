@@ -8,7 +8,7 @@ Windows Registry Editor Version 5.00
 "ApplicationIcon"="C:\\Program Files (x86)\\Vivaldi\\Application\\Vivaldi_Run.exe,0"
 "ApplicationDescription"="Vivaldi_Run manually added via registry."
  
-[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Opera\Capabilities\FileAssociations]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\Capabilities\FileAssociations]
 ".xhtml"="Vivaldi_RunHTML"
 ".xht"="Vivaldi_RunHTML"
 ".shtml"="Vivaldi_RunHTML"
@@ -32,7 +32,7 @@ Windows Registry Editor Version 5.00
 @="\"C:\\Program Files (x86)\\Vivaldi\\Application\\Vivaldi_Run.exe""
  
 [HKEY_LOCAL_MACHINE\SOFTWARE\RegisteredApplications]
-"Opera"="Software\\Clients\\StartMenuInternet\\Vivaldi_Run\\Capabilities"
+"Vivaldi_Run"="Software\\Clients\\StartMenuInternet\\Vivaldi_Run\\Capabilities"
  
 [HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML]
 "URL Protocol"=""
