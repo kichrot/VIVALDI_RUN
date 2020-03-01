@@ -1,0 +1,47 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run]
+@="Vivaldi_Run"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\Capabilities]
+"ApplicationName"="Vivaldi_Run"
+"ApplicationIcon"="C:\\Program Files\\Vivaldi\\Application\\Vivaldi_Run.exe,0"
+"ApplicationDescription"="Vivaldi_Run manually added via registry."
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Opera\Capabilities\FileAssociations]
+".xhtml"="Vivaldi_RunHTML"
+".xht"="Vivaldi_RunHTML"
+".shtml"="Vivaldi_RunHTML"
+".html"="Vivaldi_RunHTML"
+".htm"="Vivaldi_RunHTML"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\Capabilities\StartMenu]
+"StartMenuInternet"="Vivaldi_Run"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\Capabilities\URLAssociations]
+"https"="Vivaldi_RunHTML"
+"http"="Vivaldi_RunHTML"
+"ftp"="Vivaldi_RunHTML"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\DefaultIcon]
+@=""C:\\Program Files\\Vivaldi\\Application\\Vivaldi_Run.exe,0"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\shell]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\open]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run\shell\open\command]
+@="\"C:\\Program Files\\Vivaldi\\Application\\Vivaldi_Run.exe""
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\RegisteredApplications]
+"Opera"="Software\\Clients\\StartMenuInternet\\Vivaldi_Run\\Capabilities"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML]
+"URL Protocol"=""
+@="Vivaldi_Run HTML Document"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML\DefaultIcon]
+@="C:\\Program Files\\Vivaldi\\Application\\Vivaldi_Run.exe,0"
+ 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML\shell]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML\shell\open]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML\shell\open\command]
+@="\"C:\\Program Files\\Vivaldi\\Application\\Vivaldi_Run.exe\" \"%1\""

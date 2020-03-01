@@ -43,9 +43,13 @@ EndProcedure
 
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
-    Protected Command_Line.s ; переменная для хранения коммандной строки VIVALDI
-    Command_Line = ""
+    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s=""
     
+    ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
+    SetCurrentDirectory(GetPathPart(ProgramFilename())) 
+    
+    ; Получаем параметры командной строки для файла Vivaldi_Run.exe
+    Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
     ; Проверяем наличие файла VIVALDI_COMMAND_LINE.txt
     If FileSize("VIVALDI_COMMAND_LINE.txt")=-1 
         CreateFile(0, "VIVALDI_COMMAND_LINE.txt")
@@ -59,8 +63,10 @@ Procedure RunVIVALDI()
         MessageRequester("Vivaldi_Run", "File vivaldi.exe not found! / Файл vivaldi.exe не найден!", #MB_OK|#MB_ICONERROR)
         End
     Else
-        RunProgram("vivaldi.exe", Command_Line,"") 
+        Command_Line=" "+Command_Line_Vivaldi_Run+" "+Command_Line
+        RunProgram("vivaldi.exe", Command_Line,"")
     EndIf
+    
     
     ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
     CheckRun("Vivaldi_Run.exe")
@@ -287,8 +293,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 152
-; FirstLine = 18
-; Folding = g8
+; CursorPosition = 69
+; FirstLine = 12
+; Folding = I5
 ; EnableXP
 ; CompileSourceDirectory

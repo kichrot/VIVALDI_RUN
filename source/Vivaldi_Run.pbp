@@ -7,12 +7,12 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-02-23 13:38" user="User" host="OLEG-OV"/>
+    <lastopen date="2020-02-29 16:09" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="8df65960eccf1512d46fa95228c74c3b"/>
+      <fingerprint md5="6eff13378f2bc92f9ec6eed30c78ce61"/>
     </file>
   </section>
   <section name="targets">
@@ -28,17 +28,18 @@
       <debugger custom="1" type="ide"/>
       <warnings custom="1" type="display"/>
       <versioninfo enable="1">
-        <field0 value="0.1.3.0"/>
-        <field1 value="0.1.3.0"/>
+        <field0 value="0.1.4.0"/>
+        <field1 value="0.1.4.0"/>
         <field2 value="kichrot"/>
         <field3 value="Vivaldi_RUN"/>
-        <field4 value="0.1.3.0"/>
-        <field5 value="0.1.3.0"/>
+        <field4 value="0.1.4.0"/>
+        <field5 value="0.1.4.0"/>
         <field6 value="Utility to VIVALDI browser"/>
         <field7 value="Vivaldi_RUN.exe"/>
         <field8 value="Vivaldi_RUN.exe"/>
         <field9 value="kichrot"/>
         <field10 value="kichrot"/>
+        <field14 value="https://forum.vivaldi.net/topic/43971/vivaldi_run-utility-windows-only"/>
         <field15 value="VOS_NT"/>
         <field16 value="VFT_APP"/>
       </versioninfo>

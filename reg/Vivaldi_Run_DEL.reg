@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+ 
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Clients\StartMenuInternet\Vivaldi_Run]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Vivaldi_RunHTML]
+[HKEY_LOCAL_MACHINE\SOFTWARE\RegisteredApplications]
+"Vivaldi_Run"=-
