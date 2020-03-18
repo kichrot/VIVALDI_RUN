@@ -158,6 +158,7 @@ EndProcedure
 
 ; Процедура перехода на страницу по адресу из буфера обмена
 Procedure VivaldiClipboardAddress(Address.s)
+    
     Protected ClipboardText.s
     ClipboardText=GetClipboardText()
     SetClipboardText(Address)
@@ -180,6 +181,34 @@ Procedure VivaldiClipboardAddress(Address.s)
     ClipboardText=""
 EndProcedure
 
+; Процедура запуска внешнего приложения WINDOWS
+Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
+    Protected RunProgramPID, hWnd, pid, Flag=0, Program
+    Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+    RunProgramPID=ProgramID(Program)
+    Delay(2000)
+    CloseProgram(Program)
+    Repeat
+        If Flag=0
+            hWnd = FindWindow_( 0, 0 )
+            Flag=1
+        Else    
+            hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
+        EndIf
+        If hWnd <> 0
+            If IsWindowVisible_(hWnd)
+                GetWindowThreadProcessId_(hWnd, @pid)
+                If RunProgramPID=pid
+                    SetActiveWindow_(hWnd)
+                    SetForegroundWindow_(hWnd)
+                EndIf
+            EndIf
+        Else
+            Flag=0 
+        EndIf
+    Until hWnd=0
+EndProcedure
+
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
 Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; Проверяет существование активного окна с задаными классом и именем
@@ -189,15 +218,15 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; TextTitleRegExp - имя окна в формате регулярного выражения
     ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, name.s = Space(256), CountKodeKey, ClipboardText.s,  OnNumLock=0
-    Protected Dim VirtKeyCode.s(0) 
+    Protected hWnd, name.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
+    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
         ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
         CreateRegularExpression(1, VirtKeyRegExp)
         GetWindowText_(hWnd, @name, 256)
         If MatchRegularExpression(1, name)
-            CountKodeKey = ExtractRegularExpression(1, name, VirtKeyCode.s())
+            CountKodeKey=ExtractRegularExpression(1, name, VirtKeyCode.s())
             If GetKeyState_(#VK_NUMLOCK)=1
                 OnNumLock=1
                 keybd_event_(#VK_NUMLOCK, 0, 0, 0 );
@@ -220,7 +249,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")>0
                         Break
                     EndIf 
-                   Delay(0) 
+                    Delay(0) 
                 ForEver
                 Delay(1500)
                 keybd_event_(17 , 0, 0, 0)
@@ -243,6 +272,16 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
                 ; Переход на стартовую страницу VIVALDI в текущей вкладке
                 VivaldiClipboardAddress("vivaldi://startpage")
+            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=11
+                ; Реализация кнопки запуска программ WINDOWS
+                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                CountCommandLineParameters=ExtractRegularExpression(2, name, CommandLineParameters())
+                If CountCommandLineParameters=1
+                    LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "")
+                ElseIf  CountCommandLineParameters>1 
+                    LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
+                EndIf
+                FreeRegularExpression(2)
             EndIf
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
@@ -293,8 +332,7 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 69
-; FirstLine = 12
-; Folding = I5
+; CursorPosition = 35
+; Folding = Iy
 ; EnableXP
 ; CompileSourceDirectory

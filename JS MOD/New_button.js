@@ -104,3 +104,11 @@ var NewButtonToolbar = '.toolbar.toolbar-tabbar.toolbar-noflex.sync-and-trash-co
 var NewButtonTitle = 'Восстановить закрытую вкладку / Restore a closed tab';
 var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="greenyellow"><path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/></svg>';
 CreateNewButton(NewButton_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
+
+/* Кнопка "Калькулятор" / Button " Calculator" */ 
+var NewButton_KEYPRESS = '"11" |C:/Windows/System32/calc.exe| '; 
+var NewButtonClass = 'mod-calculator';
+var NewButtonToolbar = '.toolbar-addressbar.toolbar > .toolbar.toolbar-droptarget.toolbar-mainbar';
+var NewButtonTitle = 'Калькулятор';
+var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 0v24h18v-24h-18zm6 22h-4v-3h4v3zm0-4h-4v-3h4v3zm0-4h-4v-3h4v3zm5 8h-4v-3h4v3zm0-4h-4v-3h4v3zm0-4h-4v-3h4v3zm5 8h-4v-7h4v7zm0-8h-4v-3h4v3zm0-6h-14v-6h14v6zm-1-1h-12v-4h12v4z"/></svg>';
+CreateNewButton(NewButton_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
