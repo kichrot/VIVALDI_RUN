@@ -183,11 +183,11 @@ EndProcedure
 
 ; Процедура запуска внешнего приложения WINDOWS
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
-    Protected RunProgramPID, hWnd, pid, Flag=0, Program
+    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground
     Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
     RunProgramPID=ProgramID(Program)
-    Delay(2000)
     CloseProgram(Program)
+    Delay(2000)
     Repeat
         If Flag=0
             hWnd = FindWindow_( 0, 0 )
@@ -196,11 +196,15 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
             hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
         EndIf
         If hWnd <> 0
-            If IsWindowVisible_(hWnd)
+            If IsWindowVisible_(hWnd) 
                 GetWindowThreadProcessId_(hWnd, @pid)
-                If RunProgramPID=pid
-                    SetActiveWindow_(hWnd)
+                hWndForeground=GetForegroundWindow_()
+                If RunProgramPID=pid And  hWnd<>hWndForeground
+                    keybd_event_(18 , 0, 0, 0)
                     SetForegroundWindow_(hWnd)
+                    Delay(70)
+                    keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+                    SetActiveWindow_(hWnd)
                 EndIf
             EndIf
         Else
@@ -332,7 +336,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 35
-; Folding = Iy
+; CursorPosition = 192
+; FirstLine = 26
+; Folding = Ay
 ; EnableXP
 ; CompileSourceDirectory
