@@ -183,34 +183,42 @@ EndProcedure
 
 ; Процедура запуска внешнего приложения WINDOWS
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
-    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground
+    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
     Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
     RunProgramPID=ProgramID(Program)
     CloseProgram(Program)
-    Delay(2000)
     Repeat
-        If Flag=0
-            hWnd = FindWindow_( 0, 0 )
-            Flag=1
-        Else    
-            hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-        EndIf
-        If hWnd <> 0
-            If IsWindowVisible_(hWnd) 
-                GetWindowThreadProcessId_(hWnd, @pid)
-                hWndForeground=GetForegroundWindow_()
-                If RunProgramPID=pid And  hWnd<>hWndForeground
-                    keybd_event_(18 , 0, 0, 0)
-                    SetForegroundWindow_(hWnd)
-                    Delay(70)
-                    keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
-                    SetActiveWindow_(hWnd)
-                EndIf
+        Delay(10)
+        Repeat
+            If Flag=0
+                hWnd = FindWindow_( 0, 0 )
+                Flag=1
+            Else    
+                hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
             EndIf
-        Else
-            Flag=0 
-        EndIf
-    Until hWnd=0
+            If hWnd <> 0
+                If IsWindowVisible_(hWnd) 
+                    GetWindowThreadProcessId_(hWnd, @pid)
+                    hWndForeground=GetForegroundWindow_()
+                    If RunProgramPID=pid And  hWnd<>hWndForeground
+                        keybd_event_(18 , 0, 0, 0)
+                        SetForegroundWindow_(hWnd)
+                        Delay(70)
+                        keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+                        SetActiveWindow_(hWnd)
+                        hWndProg=1
+                        Break
+                    ElseIf RunProgramPID=pid And  hWnd=hWndForeground
+                        hWndProg=1
+                        Break
+                    EndIf
+                EndIf
+            Else
+                Flag=0 
+            EndIf
+        Until hWnd=0
+        Count=Count+1
+    Until hWndProg=1 Or Count=1000
 EndProcedure
 
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
@@ -336,8 +344,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 192
-; FirstLine = 26
+; CursorPosition = 216
+; FirstLine = 45
 ; Folding = Ay
 ; EnableXP
 ; CompileSourceDirectory
