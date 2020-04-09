@@ -1,4 +1,7 @@
-﻿
+﻿; * Утилита для браузера VIVALDI / Vivaldi browser utility
+; * автор / author: kichrot
+; * https://forum.vivaldi.net/topic/43971/vivaldi_run-utility-windows-only
+; * 2020 year 
 
 ; ////////////////// Процедуры и функции ////////////////////////////
 
@@ -200,7 +203,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
                 If IsWindowVisible_(hWnd) 
                     GetWindowThreadProcessId_(hWnd, @pid)
                     hWndForeground=GetForegroundWindow_()
-                    If RunProgramPID=pid And  hWnd<>hWndForeground
+                    If RunProgramPID=pid And hWnd<>hWndForeground
                         keybd_event_(18 , 0, 0, 0)
                         SetForegroundWindow_(hWnd)
                         Delay(70)
@@ -208,7 +211,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
                         SetActiveWindow_(hWnd)
                         hWndProg=1
                         Break
-                    ElseIf RunProgramPID=pid And  hWnd=hWndForeground
+                    ElseIf RunProgramPID=pid And hWnd=hWndForeground
                         hWndProg=1
                         Break
                     EndIf
@@ -231,7 +234,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
     Protected hWnd, name.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
-    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0) 
+    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
         ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
@@ -294,6 +297,37 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
                 EndIf
                 FreeRegularExpression(2)
+            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=14
+                ; Открытие страницы, по заданому адресу, в текущей вкладке
+                ClipboardText=GetClipboardText()
+                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                ExtractRegularExpression(2, name, PageAddress())
+                VivaldiClipboardAddress(PageAddress(0))
+                FreeRegularExpression(2)
+            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=15
+                ; Открытие страницы, по заданому адресу, в новой вкладке
+                ClipboardText=GetClipboardText()
+                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                ExtractRegularExpression(2, name, PageAddress())
+                SetClipboardText(PageAddress(0))
+                Delay(100)
+                keybd_event_(17 , 0, 0, 0)
+                keybd_event_(84 , 0, 0, 0)
+                Delay(70)
+                keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
+                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                Delay(500)
+                keybd_event_(17 , 0, 0, 0)
+                keybd_event_(16 , 0, 0, 0)
+                keybd_event_(86 , 0, 0, 0)
+                Delay(70)
+                keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
+                keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
+                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                Delay(300)
+                SetClipboardText(ClipboardText)
+                ClipboardText=""
+                FreeRegularExpression(2)    
             EndIf
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
@@ -344,8 +378,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 216
-; FirstLine = 45
-; Folding = Ay
+; CursorPosition = 4
+; FirstLine = 3
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
