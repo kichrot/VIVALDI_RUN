@@ -180,6 +180,7 @@ Procedure VivaldiClipboardAddress(Address.s)
     keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
     keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
     keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+    Delay(1000)
     SetClipboardText(ClipboardText)
     ClipboardText=""
 EndProcedure
@@ -282,6 +283,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 Delay(70)
                 keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                Delay(1000)
                 SetClipboardText(ClipboardText)
                 ClipboardText=""
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
@@ -302,34 +304,21 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ClipboardText=GetClipboardText()
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
+                Delay(100)
                 VivaldiClipboardAddress(PageAddress(0))
                 FreeRegularExpression(2)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=15
                 ; Открытие страницы, по заданому адресу, в новой вкладке
-                ClipboardText=GetClipboardText()
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
-                SetClipboardText(PageAddress(0))
                 Delay(100)
-                SetClipboardText(PageAddress(0))
                 keybd_event_(17 , 0, 0, 0)
                 keybd_event_(84 , 0, 0, 0)
                 Delay(70)
                 keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                SetClipboardText(PageAddress(0))
-                Delay(300)
-                SetClipboardText(PageAddress(0))
-                keybd_event_(17 , 0, 0, 0)
-                keybd_event_(16 , 0, 0, 0)
-                keybd_event_(86 , 0, 0, 0)
-                Delay(70)
-                keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(1000)
-                SetClipboardText(ClipboardText)
-                ClipboardText=""
+                Delay(500)
+                VivaldiClipboardAddress(PageAddress(0))
                 FreeRegularExpression(2)    
             EndIf
             For k = 0 To CountKodeKey-1
@@ -381,8 +370,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 322
-; FirstLine = 113
-; Folding = A1
+; CursorPosition = 306
+; FirstLine = 125
+; Folding = A2
 ; EnableXP
 ; CompileSourceDirectory
