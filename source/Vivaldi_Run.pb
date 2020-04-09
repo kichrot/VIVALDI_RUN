@@ -309,14 +309,16 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ClipboardText=GetClipboardText()
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
-                SetClipboardText("")
+                SetClipboardText(PageAddress(0))
                 Delay(100)
+                SetClipboardText(PageAddress(0))
                 keybd_event_(17 , 0, 0, 0)
                 keybd_event_(84 , 0, 0, 0)
                 Delay(70)
                 keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(500)
+                SetClipboardText(PageAddress(0))
+                Delay(300)
                 SetClipboardText(PageAddress(0))
                 keybd_event_(17 , 0, 0, 0)
                 keybd_event_(16 , 0, 0, 0)
@@ -325,7 +327,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(300)
+                Delay(1000)
                 SetClipboardText(ClipboardText)
                 ClipboardText=""
                 FreeRegularExpression(2)    
@@ -379,8 +381,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 319
-; FirstLine = 50
+; CursorPosition = 322
+; FirstLine = 113
 ; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
