@@ -161,18 +161,10 @@ EndProcedure
 
 ; Процедура перехода на страницу по адресу из буфера обмена
 Procedure VivaldiClipboardAddress(Address.s)
-    
     Protected ClipboardText.s
     ClipboardText=GetClipboardText()
     SetClipboardText(Address)
-    keybd_event_(119 , 0, 0, 0)
-    Delay(70)
-    keybd_event_(119 , 0, #KEYEVENTF_KEYUP, 0)
-    Delay(70)
-    keybd_event_(46 , 0, 0, 0)
-    Delay(70)
-    keybd_event_(46 , 0, #KEYEVENTF_KEYUP, 0)
-    Delay(70)
+    Delay(1000)
     keybd_event_(17 , 0, 0, 0)
     keybd_event_(16 , 0, 0, 0)
     keybd_event_(86 , 0, 0, 0)
@@ -374,7 +366,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 4
-; Folding = Jy
+; CursorPosition = 167
+; FirstLine = 17
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
