@@ -164,7 +164,7 @@ Procedure VivaldiClipboardAddress(Address.s)
     Protected ClipboardText.s
     ClipboardText=GetClipboardText()
     SetClipboardText(Address)
-    Delay(1000)
+    Delay(100)
     keybd_event_(17 , 0, 0, 0)
     keybd_event_(16 , 0, 0, 0)
     keybd_event_(86 , 0, 0, 0)
@@ -313,7 +313,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 Delay(70)
                 keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(500)
+                Delay(1300)
                 VivaldiClipboardAddress(PageAddress(0))
                 FreeRegularExpression(2)    
             EndIf
@@ -366,8 +366,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 167
-; FirstLine = 17
-; Folding = Aw
+; CursorPosition = 311
+; FirstLine = 124
+; Folding = A2
 ; EnableXP
 ; CompileSourceDirectory
