@@ -23,7 +23,7 @@ Procedure.s LoadFromFile(File.s)
         CloseFile(OpFile)
         ProcedureReturn Strings
     Else
-        MessageRequester("", "Не удалось открыть файл "+File)
+        MessageRequester("Vivaldi_Run", "Failed to open the file: "+File, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         End ; Завершение работы программы
     EndIf   
 EndProcedure 
@@ -63,7 +63,7 @@ Procedure RunVIVALDI()
     
     ; Проверяем наличие файла vivaldi.exe и запускаем VIVALDI
     If FileSize("vivaldi.exe")=-1 
-        MessageRequester("Vivaldi_Run", "File vivaldi.exe not found! / Файл vivaldi.exe не найден!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        MessageRequester("Vivaldi_Run", "File vivaldi.exe not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         End
     Else
         Command_Line=" "+Command_Line_Vivaldi_Run+" "+Command_Line
@@ -182,7 +182,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
     Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
     Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
     If Program=0
-        MessageRequester("Vivaldi_Run", "File "+ProgramName+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
     Else
         RunProgramPID=ProgramID(Program)
         CloseProgram(Program)
@@ -366,8 +366,7 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 311
-; FirstLine = 124
-; Folding = A2
+; CursorPosition = 25
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
