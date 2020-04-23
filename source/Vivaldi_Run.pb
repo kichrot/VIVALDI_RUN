@@ -44,6 +44,50 @@ Procedure ChangeProcessPriority(Priority)
     SetPriorityClass_(  GetCurrentProcess_(), Priority)
 EndProcedure
 
+; Процедура запуска внешнего приложения WINDOWS, с выводом окна на передний план
+Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
+    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
+    Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+    If Program=0
+        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+    Else
+        RunProgramPID=ProgramID(Program)
+        CloseProgram(Program)
+        Repeat
+            Delay(10)
+            Repeat
+                If Flag=0
+                    hWnd = FindWindow_( 0, 0 )
+                    Flag=1
+                Else    
+                    hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
+                EndIf
+                If hWnd <> 0
+                    If IsWindowVisible_(hWnd) 
+                        GetWindowThreadProcessId_(hWnd, @pid)
+                        hWndForeground=GetForegroundWindow_()
+                        If RunProgramPID=pid And hWnd<>hWndForeground
+                            keybd_event_(18 , 0, 0, 0)
+                            SetForegroundWindow_(hWnd)
+                            Delay(70)
+                            keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+                            SetActiveWindow_(hWnd)
+                            hWndProg=1
+                            Break
+                        ElseIf RunProgramPID=pid And hWnd=hWndForeground
+                            hWndProg=1
+                            Break
+                        EndIf
+                    EndIf
+                Else
+                    Flag=0 
+                EndIf
+            Until hWnd=0
+            Count=Count+1
+        Until hWndProg=1 Or Count=1000       
+    EndIf
+EndProcedure
+
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s=""
@@ -67,10 +111,9 @@ Procedure RunVIVALDI()
         End
     Else
         Command_Line=" "+Command_Line_Vivaldi_Run+" "+Command_Line
-        RunProgram("vivaldi.exe", Command_Line,"")
+        LaunchingExternalProgram("vivaldi.exe", Command_Line)
     EndIf
-    
-    
+        
     ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
     CheckRun("Vivaldi_Run.exe")
     
@@ -177,49 +220,7 @@ Procedure VivaldiClipboardAddress(Address.s)
     ClipboardText=""
 EndProcedure
 
-; Процедура запуска внешнего приложения WINDOWS
-Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
-    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
-    Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
-    If Program=0
-        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
-    Else
-        RunProgramPID=ProgramID(Program)
-        CloseProgram(Program)
-        Repeat
-            Delay(10)
-            Repeat
-                If Flag=0
-                    hWnd = FindWindow_( 0, 0 )
-                    Flag=1
-                Else    
-                    hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-                EndIf
-                If hWnd <> 0
-                    If IsWindowVisible_(hWnd) 
-                        GetWindowThreadProcessId_(hWnd, @pid)
-                        hWndForeground=GetForegroundWindow_()
-                        If RunProgramPID=pid And hWnd<>hWndForeground
-                            keybd_event_(18 , 0, 0, 0)
-                            SetForegroundWindow_(hWnd)
-                            Delay(70)
-                            keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
-                            SetActiveWindow_(hWnd)
-                            hWndProg=1
-                            Break
-                        ElseIf RunProgramPID=pid And hWnd=hWndForeground
-                            hWndProg=1
-                            Break
-                        EndIf
-                    EndIf
-                Else
-                    Flag=0 
-                EndIf
-            Until hWnd=0
-            Count=Count+1
-        Until hWndProg=1 Or Count=1000       
-    EndIf
-EndProcedure
+
 
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
 Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
@@ -296,7 +297,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 EndIf
                 FreeRegularExpression(2)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=14
-                ; Открытие страницы, по заданому адресу, в текущей вкладке
+                ; Открытие страницы, по заданному адресу, в текущей вкладке
                 ClipboardText=GetClipboardText()
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
@@ -304,7 +305,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 VivaldiClipboardAddress(PageAddress(0))
                 FreeRegularExpression(2)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=15
-                ; Открытие страницы, по заданому адресу, в новой вкладке
+                ; Открытие страницы, по заданному адресу, в новой вкладке
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
                 Delay(100)
@@ -366,7 +367,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 25
+; CursorPosition = 46
+; FirstLine = 15
 ; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
