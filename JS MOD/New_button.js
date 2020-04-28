@@ -38,7 +38,7 @@ ModPanelHidden = function (e) {
     browser.removeEventListener('mousedown', ModPanelHidden);
     browser.removeEventListener('click', ModPanelHidden);
     browser.removeEventListener('contextmenu', ModPanelHidden);
-    document.querySelector("#ButtonModPanel > button > svg").style.transform = "scale(1) rotate(90deg)";
+    document.querySelector("#ButtonModPanel > button > svg").style.transform = "scale(1)";
 };
 
 function CreateNewButtonPanel(toolbarNewButton, titleNewButton, svgNewButton, orientationNewPanel) {
@@ -66,7 +66,7 @@ function CreateNewButtonPanel(toolbarNewButton, titleNewButton, svgNewButton, or
         }
         if (ModPanel.style.visibility == "hidden") {
             ModPanel.style.cssText = ModPanelcssText + 'visibility: visible;';
-            document.querySelector("#ButtonModPanel > button > svg").style.transform = "scale(0.7) rotate(90deg)";
+            document.querySelector("#ButtonModPanel > button > svg").style.transform = "scale(0.7)";
         } else {
             ModPanelHidden();
         }
@@ -199,7 +199,7 @@ var NewButtonToolbar = '.toolbar-addressbar.toolbar > .toolbar.toolbar-droptarge
 //var NewButtonToolbar = '.toolbar.toolbar-mainbar.toolbar-extensions.toolbar-large'; 
 //var NewButtonToolbar = '.toolbar.toolbar-droptarget.toolbar-statusbar.toolbar-medium';
 var NewButtonTitle = 'Panel Vivaldi_RUN';
-var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform: scale(1) rotate(90deg);" fill="#0f0aee"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-3 18v-12l9 6-9 6z"/></svg>';
+var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#0f0aee"><path transform="rotate(90 12,12) " id="svg_1" d="m12,0c-6.627,0 -12,5.373 -12,12s5.373,12 12,12s12,-5.373 12,-12s-5.373,-12 -12,-12zm-3,18l0,-12l9,6l-9,6z"/></svg>';
 var NewPanelOrientation = 'horizontally';
 //var NewPanelOrientation = 'vertically';
 CreateNewButtonPanel(NewButtonToolbar, NewButtonTitle, NewButtonSvg, NewPanelOrientation);
