@@ -7,12 +7,12 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-04-23 22:11" user="User" host="OLEG-OV"/>
+    <lastopen date="2020-05-08 14:42" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="ea803326df7b8b13c57995213bdf87d5"/>
+      <fingerprint md5="a9fe08d9232b734892713fee232c7a79"/>
     </file>
   </section>
   <section name="targets">
@@ -28,12 +28,12 @@
       <debugger custom="1" type="ide"/>
       <warnings custom="1" type="display"/>
       <versioninfo enable="1">
-        <field0 value="0.1.6.1"/>
-        <field1 value="0.1.6.1"/>
+        <field0 value="0.1.7.0"/>
+        <field1 value="0.1.7.0"/>
         <field2 value="kichrot"/>
         <field3 value="Vivaldi_RUN"/>
-        <field4 value="0.1.6.1"/>
-        <field5 value="0.1.6.1"/>
+        <field4 value="0.1.7.0"/>
+        <field5 value="0.1.7.0"/>
         <field6 value="Utility to VIVALDI browser"/>
         <field7 value="Vivaldi_RUN.exe"/>
         <field8 value="Vivaldi_RUN.exe"/>

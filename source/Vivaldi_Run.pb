@@ -351,13 +351,17 @@ Procedure VivaldiKodeKeyWait()
         Repeat
             counter=counter+1 
             ; ищем и окно VIVALDI  с кодом клавиш и получаем коды
-            VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s", "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")
-            Delay(30)
+            If VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s", "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")=1
+                Delay(500)
+            Else
+                Delay(30)
+            EndIf
         Until counter=300
         ; ищем/ожидаем окно VIVALDI
         VivaldiWndEnumWait()
     ForEver
 EndProcedure
+
 
 ; ///////////////////////// Основной алгоритм //////////////////////////////////
 
@@ -367,8 +371,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 46
-; FirstLine = 15
-; Folding = Aw
+; CursorPosition = 363
+; FirstLine = 36
+; Folding = A5
 ; EnableXP
 ; CompileSourceDirectory
