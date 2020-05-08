@@ -113,7 +113,7 @@ Procedure RunVIVALDI()
         Command_Line=" "+Command_Line_Vivaldi_Run+" "+Command_Line
         LaunchingExternalProgram("vivaldi.exe", Command_Line)
     EndIf
-        
+    
     ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
     CheckRun("Vivaldi_Run.exe")
     
@@ -273,14 +273,17 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(123 , 0, 0, 0)
-                Delay(70)
+                Delay(50)
+                keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
+                keybd_event_(123 , 0, 0, 0)
+                Delay(50)
                 keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, 0, 0)
                 keybd_event_(87 , 0, 0, 0)
                 Delay(70)
                 keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(1000)
+                Delay(500)
                 SetClipboardText(ClipboardText)
                 ClipboardText=""
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
@@ -371,8 +374,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 363
-; FirstLine = 36
-; Folding = A5
+; CursorPosition = 270
+; FirstLine = 21
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
