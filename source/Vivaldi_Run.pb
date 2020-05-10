@@ -220,8 +220,6 @@ Procedure VivaldiClipboardAddress(Address.s)
     ClipboardText=""
 EndProcedure
 
-
-
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
 Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; Проверяет существование активного окна с задаными классом и именем
@@ -347,7 +345,7 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counterDevTools
+    Protected counter
     Repeat 
         counter=0
         Repeat
@@ -373,8 +371,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 349
-; FirstLine = 13
-; Folding = A5
+; CursorPosition = 89
+; FirstLine = 7
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
