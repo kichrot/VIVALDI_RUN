@@ -31,7 +31,7 @@ var ModMenucssText = '' +
     'visibility: hidden;';
 
 ModMenuHidden = function (e) {
-    ModMenu.style.cssText = ModMenucssText; //Скрываем панель
+    ModMenu.style.cssText = ModMenucssText; 
     browser.removeEventListener('mousedown', ModMenuHidden);
     browser.removeEventListener('click', ModMenuHidden);
     browser.removeEventListener('contextmenu', ModMenuHidden);
@@ -62,7 +62,7 @@ function CreateNewButtonMenu(toolbarNewButton, titleNewButton, svgNewButton) {
             ModMenucssText = ModMenucssText + ('left: ' + String(ModMenuOffsetWidth) + 'px;');
         }
         if (ModMenu.style.visibility == "hidden") {
-            ModMenu.style.cssText = ModMenucssText + 'visibility: visible;'; //Показываем панель
+            ModMenu.style.cssText = ModMenucssText + 'visibility: visible;'; 
             document.querySelector("#ButtonModMenu > button > svg").style.transform = "scale(0.7)";
         } else {
             ModMenuHidden();
@@ -198,7 +198,7 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
 var NewButtonToolbar = '.toolbar-addressbar.toolbar > .toolbar.toolbar-droptarget.toolbar-mainbar';
 //var NewButtonToolbar = '.toolbar.toolbar-mainbar.toolbar-extensions.toolbar-large'; 
 //var NewButtonToolbar = '.toolbar.toolbar-droptarget.toolbar-statusbar.toolbar-medium';
-var NewButtonTitle = 'Меню Vivaldi_RUN';
+var NewButtonTitle = 'Menu Vivaldi_RUN';
 var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#205AFC"><path d="M4 22h-4v-4h4v4zm0-12h-4v4h4v-4zm0-8h-4v4h4v-4zm3 0v4h17v-4h-17zm0 12h17v-4h-17v4zm0 8h17v-4h-17v4z"/></svg>';
 CreateNewButtonMenu(NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
@@ -274,7 +274,7 @@ var NewItem_KEYPRESS = '"15" |vivaldi://startpage| ';
 var NewItemClass = 'mod_menu-startpage';
 var NewItemToolbar = 'div#ModMenu';
 var NewItemSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 19h-4v-4h4v4zm-6-10h-4v4h4v-4zm6 0h-4v4h4v-4zm-12 6h-4v4h4v-4zm16-14v22h-24v-22h24zm-2 6h-20v14h20v-14zm-8 8h-4v4h4v-4zm-6-6h-4v4h4v-4z"/></svg>';
-var NewItemText = 'Startpage';
+var NewItemText = 'Express panel';
 var NewItemSeparator = 'N';
 //var NewItemSeparator = 'Y';
 CreateNewItem(NewItem_KEYPRESS, NewItemClass, NewItemToolbar, NewItemSvg, NewItemText, NewItemSeparator);
