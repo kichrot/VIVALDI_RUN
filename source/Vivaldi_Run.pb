@@ -192,11 +192,12 @@ Procedure VivaldiWndEnumWait()
     Repeat    
         If WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")=0
             counter=counter+1
-            Delay(10)
+            Delay(40)
         Else 
             Break    
         EndIf
-        If counter=6000
+        If counter=3000 
+;             MessageRequester("Vivaldi_Run", "Закрытие", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
@@ -229,7 +230,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; TextTitleRegExp - имя окна в формате регулярного выражения
     ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, name.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
+    Protected hWnd, hWnd2, name.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
@@ -337,7 +338,11 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     Else
         ProcedureReturn 0
     EndIf
-    SetWindowText_(hWnd," - Vivaldi")
+    ; SetWindowText_(hWnd," - Vivaldi")
+    GetWindowText_(hWnd2, @name, 256)
+    If hWnd=hWnd2
+        SetWindowText_(hWnd,"  - Vivaldi")
+    EndIf    
     FreeRegularExpression(1)
     ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
     ProcedureReturn 1 
@@ -371,8 +376,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 89
-; FirstLine = 7
-; Folding = Aw
+; CursorPosition = 343
+; FirstLine = 168
+; Folding = B0
 ; EnableXP
 ; CompileSourceDirectory
