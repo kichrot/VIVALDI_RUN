@@ -230,7 +230,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; TextTitleRegExp - имя окна в формате регулярного выражения
     ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, hWnd2, name.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
+    Protected hWnd, name.s = Space(256),  name2.s = Space(256),CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
@@ -338,9 +338,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     Else
         ProcedureReturn 0
     EndIf
-    ; SetWindowText_(hWnd," - Vivaldi")
-    GetWindowText_(hWnd2, @name, 256)
-    If hWnd=hWnd2
+    GetWindowText_(hWnd, @name2, 256)
+    If name=name2
         SetWindowText_(hWnd,"  - Vivaldi")
     EndIf    
     FreeRegularExpression(1)
@@ -376,8 +375,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 343
-; FirstLine = 168
+; CursorPosition = 340
+; FirstLine = 165
 ; Folding = B0
 ; EnableXP
 ; CompileSourceDirectory
