@@ -16,17 +16,20 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var ModMenucssText = '' +
+    'max-height: 81vh;' +
+	'display: block;' +
+    'overflow-y: auto;' +
     'position: absolute;' +
     'top: 37px;' +
     'left:0px;' +
     'background-color: var(--colorBg);' +
+    //'background-color: var(--colorAccentBg);' +
     'flex-shrink: 2;' +
     'box-shadow: 0 0 0 1px var(--colorBorder), 0 2px 6px rgba(0, 0, 0, 0.25);' +
     'border-radius: var(--radiusHalf);' +
-    'display: table;' +
     'order: -1;' +
     'float: left;' +
-    'zoom: 105%;' +
+    'zoom: 100%;' +
     'min-width: 50px;' +
     'visibility: hidden;';
 
@@ -76,6 +79,7 @@ function CreateNewButtonMenu(toolbarNewButton, titleNewButton, svgNewButton) {
             'justify-content: center;' +
             'align-items: center;' +
             'background-color: var(--colorBg);' +
+           //'background-color: var(--colorAccentBg);' + 
             'background-repeat: no-repeat;' +
             'background-position: 50% 50%;' +
             'border: 0 solid rgba(0, 0, 0, 0);' +
@@ -138,10 +142,11 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
 
     function NewItem() {
         ItemcssText = '' +
-            'display: inline-flex;' +
+            'max-height: 1.6em;' +
             'justify-content: left;' +
             'align-items: center;' +
             'background-color: var(--colorBg);' +
+            //'background-color: var(--colorAccentBg);' +
             'background-repeat: no-repeat;' +
             'background-position: 50% 50%;' +
             'border: 0 solid rgba(0, 0, 0, 0);' +
@@ -150,6 +155,7 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
             'color: inherit;' +
             'padding: 0;' +
             'border-style: unset;';
+            
         var toolbar = document.querySelector(toolbarNewItem);
         var outer_div = document.createElement('div');
         outer_div.classList.add('button-toolbar', classNewItem);
@@ -163,8 +169,8 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
         if (svgNewItem == "") {
             svgNewItem = '<svg width="24" height="24" viewBox="0 0 24 24" transform="scale(0.5)" xmlns="http://www.w3.org/2000/svg" xmlns:serif="http://www.serif.com/" fill-rule="evenodd" clip-rule="evenodd"><circle serif:id="shape 19" cx="12" cy="12" r="12"/></svg>';
         }
-        Item.innerHTML = svgNewItem + '<div style="margin-left: 18px; font-size: 110%; color: black;" >' + textNewItem + '</div>';
-        Item.style.cssText = ItemcssText + 'height: 34px;';
+        Item.innerHTML = svgNewItem + '<div style="margin-left: 18px; font-size: 110%; color: var(--colorFg);" >' + textNewItem + '</div>';
+        Item.style.cssText = ItemcssText + 'height: 1.6em;';
         outer_div.appendChild(Item);
         toolbar.appendChild(outer_div);
     }
@@ -195,7 +201,8 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
 // Добавление еще одной такой кнопки может привести к различным нарушениям в работе браузера VIVALDI.
 // Правила изменения переменных данной кнопки читайте в Руководстве пользователя к утилите "Vivaldi_RUN".
 
-var NewButtonToolbar = '.toolbar-addressbar.toolbar > .toolbar.toolbar-droptarget.toolbar-mainbar';
+
+var NewButtonToolbar = '.toolbar.toolbar-droptarget.toolbar-mainbar.toolbar-large';
 //var NewButtonToolbar = '.toolbar.toolbar-mainbar.toolbar-extensions.toolbar-large'; 
 //var NewButtonToolbar = '.toolbar.toolbar-droptarget.toolbar-statusbar.toolbar-medium';
 var NewButtonTitle = 'Menu Vivaldi_RUN';
