@@ -8,6 +8,8 @@
 ; Процедура чтения файла (возвращает содержимое в виде строки)
 Procedure.s LoadFromFile(File.s)
     Protected OpFile,StringFormat,String.s,Strings.s
+    CreateRegularExpression(0, "(?<=()<)(.*?)(?=()>)")
+    CreateRegularExpression(1, "[<][>]")
     If OpenFile(OpFile, File.s)   
         While Eof(OpFile) = 0              ; пока не прочли весь файл
             StringFormat = ReadStringFormat(OpFile)
@@ -17,15 +19,21 @@ Procedure.s LoadFromFile(File.s)
                 String =  ReadString(OpFile,#PB_UTF8)  ; читает строки как UTF8 построчно
             ElseIf StringFormat = #PB_Unicode
                 String =  ReadString(OpFile,#PB_Unicode)  ; читает строки как UTF16 построчно
-            EndIf 
-            Strings= Strings+" "+String
+            EndIf
+            String = ReplaceRegularExpression(0, String, "") ; удаляем комментарии из строки
+            String = ReplaceRegularExpression(1, String, " ") ; удаляем символы комментария из строки
+            Strings = Strings+" "+String
         Wend
         CloseFile(OpFile)
+        FreeRegularExpression(0)
+        FreeRegularExpression(1)
         ProcedureReturn Strings
     Else
         MessageRequester("Vivaldi_Run", "Failed to open the file: "+File, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        FreeRegularExpression(0)
+        FreeRegularExpression(1)
         End ; Завершение работы программы
-    EndIf   
+    EndIf
 EndProcedure 
 
 ; Процедура запрета повторного запуска VIVALDI
@@ -375,8 +383,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 340
-; FirstLine = 165
-; Folding = B0
+; CursorPosition = 15
+; FirstLine = 6
+; Folding = h9
 ; EnableXP
 ; CompileSourceDirectory
