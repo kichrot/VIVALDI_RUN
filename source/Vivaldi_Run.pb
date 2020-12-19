@@ -19,10 +19,10 @@ Procedure.s LoadFromFile(File.s)
             ElseIf StringFormat = #PB_Unicode
                 String =  ReadString(OpFile,#PB_Unicode)  ; читает строки как UTF16 построчно
             EndIf
-            String = ReplaceRegularExpression(0, String, "") ; удаляем комментарии из строки
             Strings = Strings+" "+String
         Wend
         CloseFile(OpFile)
+        Strings = ReplaceRegularExpression(0, Strings, " ") ; удаляем комментарии
         FreeRegularExpression(0)
         ProcedureReturn Strings
     Else
@@ -379,8 +379,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 30
-; FirstLine = 8
+; CursorPosition = 23
+; FirstLine = 4
 ; Folding = h9
 ; EnableXP
 ; CompileSourceDirectory
