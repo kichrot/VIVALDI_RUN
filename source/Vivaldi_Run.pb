@@ -313,14 +313,19 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ; Открытие страницы, по заданному адресу, в новой вкладке
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
-                Delay(100)
-                keybd_event_(17 , 0, 0, 0)
-                keybd_event_(84 , 0, 0, 0)
-                Delay(70)
-                keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(1300)
-                VivaldiClipboardAddress(PageAddress(0))
+                
+                ; отключено до конца испытаний функции LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34)) 
+;                 Delay(10)
+;                 keybd_event_(17 , 0, 0, 0)
+;                 keybd_event_(84 , 0, 0, 0)
+;                 Delay(70)
+;                 keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
+;                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+;                 Delay(1300)
+;                 VivaldiClipboardAddress(PageAddress(0))
+                
+                LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34))
+                               
                 FreeRegularExpression(2)    
             EndIf
             For k = 0 To CountKodeKey-1
@@ -337,9 +342,11 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             EndIf
         Else
             FreeRegularExpression(1)
+            ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
             ProcedureReturn 0   
         EndIf   
     Else
+        ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
         ProcedureReturn 0
     EndIf
     GetWindowText_(hWnd, @name2, 256)
@@ -379,8 +386,8 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 23
-; FirstLine = 4
-; Folding = h9
+; CursorPosition = 320
+; FirstLine = 142
+; Folding = Q9
 ; EnableXP
 ; CompileSourceDirectory
