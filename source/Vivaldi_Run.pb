@@ -94,7 +94,8 @@ EndProcedure
 
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI(Command_Line_P.s)
-    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s=""
+    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
+    Protected Dim ParamVivaldi_Run.s(0)
     
     If Command_Line_P=""
         ; меняем приоритет своего процесса
@@ -121,6 +122,16 @@ Procedure RunVIVALDI(Command_Line_P.s)
         End
     Else
         Command_Line=Command_Line_P+" "+Command_Line_Vivaldi_Run+" "+Command_Line
+        
+        ; Проверяем наличие в параметрах коммандной строки параметра мини режима --only-start-with-VIVALDI_COMMAND_LINE.txt
+        CreateRegularExpression(3, "--only-start-with-VIVALDI_COMMAND_LINE.txt")
+        CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
+        FreeRegularExpression(3)
+        If CountParamVivaldi_Run>0
+            LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
+            End
+        EndIf   
+        
         If Command_Line_P=""
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
         Else
@@ -385,7 +396,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 371
+; CursorPosition = 326
+; FirstLine = 12
 ; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
