@@ -126,6 +126,7 @@ Procedure RunVIVALDI(Command_Line_P.s)
         ; Проверяем наличие в параметрах коммандной строки параметра мини режима --only-start-with-VIVALDI_COMMAND_LINE.txt
         CreateRegularExpression(3, "--only-start-with-VIVALDI_COMMAND_LINE.txt")
         CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
+        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --only-start-with-VIVALDI_COMMAND_LINE.txt
         FreeRegularExpression(3)
         If CountParamVivaldi_Run>0
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
@@ -396,8 +397,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 326
-; FirstLine = 12
-; Folding = Aw
+; CursorPosition = 125
+; FirstLine = 40
+; Folding = Qw
 ; EnableXP
 ; CompileSourceDirectory
