@@ -97,13 +97,15 @@ Procedure RunVIVALDI(Command_Line_P.s)
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s=""
     
     If Command_Line_P=""
+        ; меняем приоритет своего процесса
+        ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
+        
         ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
         SetCurrentDirectory(GetPathPart(ProgramFilename())) 
     EndIf
     
     ; Получаем параметры командной строки для файла Vivaldi_Run.exe
     Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
-    
     
     ; Проверяем наличие файла VIVALDI_COMMAND_LINE.txt
     If FileSize("VIVALDI_COMMAND_LINE.txt")=-1 
@@ -210,7 +212,7 @@ Procedure VivaldiWndEnumWait()
             Break    
         EndIf
         If counter=3000 
-;             MessageRequester("Vivaldi_Run", "Закрытие", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+            ;             MessageRequester("Vivaldi_Run", "Закрытие", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
@@ -322,21 +324,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ; Открытие страницы, по заданному адресу, в новой вкладке
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
-                
-                ; отключено до конца испытаний функции LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34)) 
-;                 Delay(10)
-;                 keybd_event_(17 , 0, 0, 0)
-;                 keybd_event_(84 , 0, 0, 0)
-;                 Delay(70)
-;                 keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
-;                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-;                 Delay(1300)
-;                 VivaldiClipboardAddress(PageAddress(0))
-                
-;                 LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34))
-                
-                  RunVIVALDI(PageAddress(0))
-                
+                RunVIVALDI(PageAddress(0))
                 FreeRegularExpression(2)    
             EndIf
             For k = 0 To CountKodeKey-1
@@ -397,8 +385,7 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 122
-; FirstLine = 81
-; Folding = Y9
+; CursorPosition = 371
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
