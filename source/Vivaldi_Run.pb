@@ -93,14 +93,18 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
 EndProcedure
 
 ; Процедура запуска VIVALDI
-Procedure RunVIVALDI()
+Procedure RunVIVALDI(Command_Line_P.s)
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s=""
     
-    ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
-    SetCurrentDirectory(GetPathPart(ProgramFilename())) 
+    If Command_Line_P=""
+        ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
+        SetCurrentDirectory(GetPathPart(ProgramFilename())) 
+    EndIf
     
     ; Получаем параметры командной строки для файла Vivaldi_Run.exe
     Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
+    
+    
     ; Проверяем наличие файла VIVALDI_COMMAND_LINE.txt
     If FileSize("VIVALDI_COMMAND_LINE.txt")=-1 
         CreateFile(0, "VIVALDI_COMMAND_LINE.txt")
@@ -114,16 +118,21 @@ Procedure RunVIVALDI()
         MessageRequester("Vivaldi_Run", "File vivaldi.exe not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         End
     Else
-        Command_Line=" "+Command_Line_Vivaldi_Run+" "+Command_Line
-        LaunchingExternalProgram("vivaldi.exe", Command_Line)
+        Command_Line=Command_Line_P+" "+Command_Line_Vivaldi_Run+" "+Command_Line
+        If Command_Line_P=""
+            LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
+        Else
+            RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line,"", #PB_Program_Open)
+        EndIf    
     EndIf
     
-    ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
-    CheckRun("Vivaldi_Run.exe")
-    
-    ; меняем приоритет своего процесса
-    ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
-    
+    If Command_Line_P=""
+        ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
+        CheckRun("Vivaldi_Run.exe")
+        
+        ; меняем приоритет своего процесса
+        ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+    EndIf
 EndProcedure
 
 ; Процедура поиска окон
@@ -324,8 +333,10 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
 ;                 Delay(1300)
 ;                 VivaldiClipboardAddress(PageAddress(0))
                 
-                LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34))
-                               
+;                 LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"Vivaldi_Run.exe", Chr(34)+PageAddress(0)+Chr(34))
+                
+                  RunVIVALDI(PageAddress(0))
+                
                 FreeRegularExpression(2)    
             EndIf
             For k = 0 To CountKodeKey-1
@@ -381,13 +392,13 @@ EndProcedure
 ; ///////////////////////// Основной алгоритм //////////////////////////////////
 
 ; Запускаем VIVALDI
-RunVIVALDI()
+RunVIVALDI("")
 
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 320
-; FirstLine = 142
-; Folding = Q9
+; CursorPosition = 122
+; FirstLine = 81
+; Folding = Y9
 ; EnableXP
 ; CompileSourceDirectory
