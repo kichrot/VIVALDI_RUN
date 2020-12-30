@@ -283,16 +283,24 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=7
                 ; Открыть DevTools для интерфейса VIVALDI 
                 Protected counter=0
-                keybd_event_(17 , 0, 0, 0)
-                keybd_event_(84 , 0, 0, 0)
-                Delay(10)
-                keybd_event_(84 , 0, #KEYEVENTF_KEYUP, 0)
-                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                Delay(1300)
-                VivaldiClipboardAddress("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
-                keybd_event_(123 , 0, 0, 0)
-                Delay(10)
-                keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
+                RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
+                
+                
+                Repeat 
+                    If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
+                        counter=counter+1
+                        Delay(5)
+                    Else 
+                        keybd_event_(123 , 0, 0, 0)
+                        Delay(10)
+                        keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
+                        counter=0
+                        Break    
+                    EndIf
+                    If counter=2000
+                        Break
+                    EndIf
+                ForEver
                 Repeat 
                     If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
                         counter=counter+1
@@ -311,7 +319,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                         keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
                         Break    
                     EndIf
-                    If counter=1000
+                    If counter=2000
                         MessageRequester("Vivaldi_Run", "Failed to open the DevTools", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
                         Break
                     EndIf
@@ -402,7 +410,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 399
-; Folding = Aw
+; CursorPosition = 320
+; FirstLine = 84
+; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
