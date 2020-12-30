@@ -215,6 +215,7 @@ EndProcedure
 
 ; Процедура проверки наличия и ожидания окон VIVALDI
 Procedure VivaldiWndEnumWait()
+    
     Protected counter=0
     Repeat    
         If WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")=0
@@ -229,6 +230,7 @@ Procedure VivaldiWndEnumWait()
         EndIf
     ForEver
 EndProcedure
+
 
 ; Процедура перехода на страницу по адресу из буфера обмена
 Procedure VivaldiClipboardAddress(Address.s)
@@ -261,11 +263,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
-        ; переход на страницу
-        keybd_event_(120, 0, 0, 0 );
-        Delay(50)
-        keybd_event_(120, 0, #KEYEVENTF_KEYUP, 0);
-        Delay(10)
         ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
         CreateRegularExpression(1, VirtKeyRegExp)
         GetWindowText_(hWnd, @name, 256)
@@ -277,6 +274,13 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 Delay(50)
                 keybd_event_(#VK_NUMLOCK, 0, #KEYEVENTF_KEYUP, 0); 
             EndIf
+            If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36)
+                ; перевод фокуса на страницу
+                keybd_event_(120, 0, 0, 0 );
+                Delay(50)
+                keybd_event_(120, 0, #KEYEVENTF_KEYUP, 0);
+                Delay(10)
+            EndIf
             If CountKodeKey=1 And Val(VirtKeyCode(0))=0
                 ; Реализация рестарта VIVALDI
                 VivaldiClipboardAddress("vivaldi://restart")
@@ -284,8 +288,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ; Открыть DevTools для интерфейса VIVALDI 
                 Protected counter=0
                 RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
-                
-                
                 Repeat 
                     If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
                         counter=counter+1
@@ -294,36 +296,46 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                         keybd_event_(123 , 0, 0, 0)
                         Delay(10)
                         keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
-                        counter=0
-                        Break    
-                    EndIf
-                    If counter=2000
-                        Break
-                    EndIf
-                ForEver
-                Repeat 
-                    If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
-                        counter=counter+1
-                        Delay(5)
-                    Else
-                        keybd_event_(18 , 0, 0, 0)
-                        SetForegroundWindow_(hWnd)
-                        Delay(10)
-                        keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
-                        SetActiveWindow_(hWnd)
                         Delay(50)
                         keybd_event_(17 , 0, 0, 0)
-                        keybd_event_(87 , 0, 0, 0)
+                        keybd_event_(16 , 0, 0, 0)
+                        keybd_event_(73 , 0, 0, 0)
                         Delay(10)
-                        keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
+                        keybd_event_(73 , 0, #KEYEVENTF_KEYUP, 0)
+                        keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
                         keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                        counter=0
+                        Delay(300)
+                        Repeat 
+                            If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
+                                counter=counter+1
+                                Delay(5)
+                            Else
+                                keybd_event_(18 , 0, 0, 0)
+                                SetForegroundWindow_(hWnd)
+                                Delay(10)
+                                keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+                                SetActiveWindow_(hWnd)
+                                Delay(50)
+                                keybd_event_(17 , 0, 0, 0)
+                                keybd_event_(87 , 0, 0, 0)
+                                Delay(10)
+                                keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
+                                keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                                Break    
+                            EndIf
+                            If counter=3000
+                                MessageRequester("Vivaldi_Run", "Failed to open the DevTools", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+                                Break
+                            EndIf
+                        ForEver
                         Break    
                     EndIf
-                    If counter=2000
-                        MessageRequester("Vivaldi_Run", "Failed to open the DevTools", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+                    If counter=5000
                         Break
                     EndIf
                 ForEver
+                
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
                 ; Переход на стартовую страницу VIVALDI в текущей вкладке
                 VivaldiClipboardAddress("vivaldi://startpage")
@@ -410,8 +422,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 320
-; FirstLine = 84
-; Folding = A1
+; CursorPosition = 298
+; FirstLine = 65
+; Folding = A9
 ; EnableXP
 ; CompileSourceDirectory
