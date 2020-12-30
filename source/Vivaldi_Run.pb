@@ -261,6 +261,11 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
+        ; переход на страницу
+        keybd_event_(120, 0, 0, 0 );
+        Delay(50)
+        keybd_event_(120, 0, #KEYEVENTF_KEYUP, 0);
+        Delay(10)
         ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
         CreateRegularExpression(1, VirtKeyRegExp)
         GetWindowText_(hWnd, @name, 256)
@@ -337,7 +342,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                 ExtractRegularExpression(2, name, PageAddress())
                 RunVIVALDI(PageAddress(0))
-                FreeRegularExpression(2)    
+                FreeRegularExpression(2)
             EndIf
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
@@ -397,8 +402,7 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 125
-; FirstLine = 40
-; Folding = Qw
+; CursorPosition = 399
+; Folding = Aw
 ; EnableXP
 ; CompileSourceDirectory
