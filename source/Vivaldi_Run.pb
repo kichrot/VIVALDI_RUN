@@ -319,10 +319,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                                 Else
                                     keybd_event_(18 , 0, 0, 0)
                                     SetForegroundWindow_(hWnd)
-                                    Delay(10)
                                     keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
                                     SetActiveWindow_(hWnd)
-                                    Delay(50)
                                     keybd_event_(17 , 0, 0, 0)
                                     keybd_event_(87 , 0, 0, 0)
                                     Delay(10)
@@ -429,8 +427,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 424
-; FirstLine = 19
-; Folding = Aw
+; CursorPosition = 324
+; FirstLine = 91
+; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
