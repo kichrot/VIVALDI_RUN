@@ -304,14 +304,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                             keybd_event_(123 , 0, 0, 0)
                             Delay(10)
                             keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
-                            Delay(50)
-                            keybd_event_(17 , 0, 0, 0)
-                            keybd_event_(16 , 0, 0, 0)
-                            keybd_event_(73 , 0, 0, 0)
-                            Delay(10)
-                            keybd_event_(73 , 0, #KEYEVENTF_KEYUP, 0)
-                            keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
-                            keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
                             Repeat 
                                 If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
                                     counter=counter+1
@@ -321,6 +313,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                                     SetForegroundWindow_(hWnd)
                                     keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
                                     SetActiveWindow_(hWnd)
+                                    keybd_event_(123 , 0, 0, 0)
+                                    Delay(10)
+                                    keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
                                     keybd_event_(17 , 0, 0, 0)
                                     keybd_event_(87 , 0, 0, 0)
                                     Delay(10)
@@ -427,8 +422,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 324
-; FirstLine = 91
+; CursorPosition = 314
+; FirstLine = 158
 ; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
