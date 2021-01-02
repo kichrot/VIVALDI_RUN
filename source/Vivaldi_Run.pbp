@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.70 LTS (Windows - x86)">
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.72 (Windows - x86)">
   <section name="config">
     <options closefiles="1" openmode="1" name="VIVALDI_RUN"/>
   </section>
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-01 11:45" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-01-02 19:20" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="5121a411808576ebc95b5b59cc270c1c"/>
+      <fingerprint md5="2b8c782b77157ac6776fc4f0306a9441"/>
     </file>
   </section>
   <section name="targets">
     <target name="Vivaldi_Run.pb" enabled="1" default="1">
       <inputfile value="Vivaldi_Run.pb"/>
       <outputfile value="Vivaldi_Run.exe"/>
-      <compiler version="PureBasic 5.70 LTS (Windows - x86)"/>
+      <compiler version="PureBasic 5.72 (Windows - x64)"/>
       <executable value="Vivaldi_Run.exe"/>
       <directory value="C:\Program Files\Vivaldi\Application\"/>
-      <options asm="1" thread="1" onerror="1" debug="1"/>
+      <options asm="1" thread="1" debug="1"/>
       <purifier enable="1"/>
       <icon enable="1">VIvaldi_RUN.ico</icon>
+      <format exe="default" cpu="1"/>
       <debugger custom="1" type="ide"/>
       <warnings custom="1" type="display"/>
       <versioninfo enable="1">

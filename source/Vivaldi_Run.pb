@@ -300,7 +300,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                             Delay(5)
                         Else 
                             counter=0
-                            Delay(300)
+                            Delay(100)
                             keybd_event_(123 , 0, 0, 0)
                             Delay(10)
                             keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
@@ -316,6 +316,12 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                                     keybd_event_(123 , 0, 0, 0)
                                     Delay(10)
                                     keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
+                                    keybd_event_(17 , 0, 0, 0)
+                                    keybd_event_(87 , 0, 0, 0)
+                                    Delay(10)
+                                    keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
+                                    keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                                    Delay(50)
                                     keybd_event_(17 , 0, 0, 0)
                                     keybd_event_(87 , 0, 0, 0)
                                     Delay(10)
@@ -421,9 +427,13 @@ RunVIVALDI("")
 
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
-; IDE Options = PureBasic 5.70 LTS (Windows - x86)
-; CursorPosition = 314
-; FirstLine = 158
-; Folding = A1
+
+EnableExplicit
+
+
+; IDE Options = PureBasic 5.72 (Windows - x86)
+; CursorPosition = 302
+; FirstLine = 135
+; Folding = g1
 ; EnableXP
 ; CompileSourceDirectory
