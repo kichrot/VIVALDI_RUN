@@ -1,7 +1,7 @@
 ﻿; * Утилита для браузера VIVALDI / Vivaldi browser utility
 ; * автор / author: kichrot
 ; * https://forum.vivaldi.net/topic/43971/vivaldi_run-utility-windows-only
-; * 2020 year 
+; * 2021 year 
 
 ; ////////////////// Процедуры и функции ////////////////////////////
 
@@ -300,43 +300,31 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                             Delay(5)
                         Else 
                             counter=0
-                            Delay(100)
+                            Delay(50)
                             keybd_event_(123 , 0, 0, 0)
                             Delay(10)
                             keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
+                            keybd_event_(17 , 0, 0, 0)
+                            keybd_event_(87 , 0, 0, 0)
+                            Delay(10)
+                            keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
+                            keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                            
                             Repeat 
                                 If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
                                     counter=counter+1
                                     Delay(5)
                                 Else
-                                    keybd_event_(18 , 0, 0, 0)
-                                    SetForegroundWindow_(hWnd)
-                                    keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
-                                    SetActiveWindow_(hWnd)
-                                    keybd_event_(123 , 0, 0, 0)
-                                    Delay(10)
-                                    keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
-                                    keybd_event_(17 , 0, 0, 0)
-                                    keybd_event_(87 , 0, 0, 0)
-                                    Delay(10)
-                                    keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
-                                    keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                                    Delay(50)
-                                    keybd_event_(17 , 0, 0, 0)
-                                    keybd_event_(87 , 0, 0, 0)
-                                    Delay(10)
-                                    keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
-                                    keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
                                     Break    
                                 EndIf
-                                If counter=3000
+                                If counter=2000
                                     MessageRequester("Vivaldi_Run", "Failed to open the DevTools", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
                                     Break
                                 EndIf
                             ForEver
                             Break    
                         EndIf
-                        If counter=5000
+                        If counter=2000
                             Break
                         EndIf
                     ForEver
@@ -432,8 +420,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 302
-; FirstLine = 135
-; Folding = g1
+; CursorPosition = 304
+; FirstLine = 100
+; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
