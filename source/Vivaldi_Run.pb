@@ -309,22 +309,10 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                             Delay(10)
                             keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
                             keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                            
-                            Repeat 
-                                If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "Y")=0
-                                    counter=counter+1
-                                    Delay(5)
-                                Else
-                                    Break    
-                                EndIf
-                                If counter=2000
-                                    MessageRequester("Vivaldi_Run", "Failed to open the DevTools", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
-                                    Break
-                                EndIf
-                            ForEver
+;                             
                             Break    
                         EndIf
-                        If counter=2000
+                        If counter=800
                             Break
                         EndIf
                     ForEver
@@ -420,8 +408,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 304
-; FirstLine = 100
+; CursorPosition = 311
+; FirstLine = 67
 ; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
