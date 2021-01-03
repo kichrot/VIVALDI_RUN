@@ -286,7 +286,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 VivaldiClipboardAddress("vivaldi://restart")
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=7
                 ; Открыть DevTools для интерфейса VIVALDI 
-                Protected counter=0, counter_2=0
+                Protected counter=0, counter_2=0, counter_3=0
                 hWndDevTool=0
                 If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
                     hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
@@ -296,7 +296,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
                     counter=0
                     Repeat
+                        counter=0
                         counter_2=1
+                        counter_3=counter_3 + 1
                         Repeat 
                             If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
                                 counter=counter+1
@@ -317,7 +319,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                             EndIf
                             If counter=800
                                 Delay(500)
-                                If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")=0
+                                If counter_3 < 2 And WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")=0
                                     counter_2=0  
                                 EndIf    
                                 Break
@@ -418,7 +420,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 304
+; CursorPosition = 385
+; FirstLine = 32
 ; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
