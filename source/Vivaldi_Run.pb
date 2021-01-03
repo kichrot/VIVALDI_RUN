@@ -305,7 +305,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                                 Delay(5)
                             Else 
                                 counter=0
-                                Delay(50)
+                                Delay(300)
                                 keybd_event_(123 , 0, 0, 0)
                                 Delay(10)
                                 keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
@@ -314,7 +314,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                                 Delay(10)
                                 keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
                                 keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
-                                ;                             
                                 Break    
                             EndIf
                             If counter=800
@@ -420,8 +419,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 385
-; FirstLine = 32
+; CursorPosition = 308
+; FirstLine = 80
 ; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory
