@@ -277,9 +277,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36)
                 ; перевод фокуса на страницу
                 keybd_event_(120, 0, 0, 0 );
-                Delay(50)
+                Delay(100)
                 keybd_event_(120, 0, #KEYEVENTF_KEYUP, 0);
-                Delay(10)
             EndIf
             If CountKodeKey=1 And Val(VirtKeyCode(0))=0
                 ; Реализация рестарта VIVALDI
@@ -348,7 +347,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
             Next
-            Delay(70)
+            Delay(100)
             For k=CountKodeKey-1 To 0 Step -1
                 keybd_event_(Val(VirtKeyCode(k)), 0, #KEYEVENTF_KEYUP, 0)
             Next
@@ -407,8 +406,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 395
-; FirstLine = 23
-; Folding = Aw
+; CursorPosition = 349
+; FirstLine = 115
+; Folding = A1
 ; EnableXP
 ; CompileSourceDirectory

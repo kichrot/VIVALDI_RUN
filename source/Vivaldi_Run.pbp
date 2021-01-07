@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.72 (Windows - x86)">
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.70 LTS (Windows - x86)">
   <section name="config">
     <options closefiles="1" openmode="1" name="VIVALDI_RUN"/>
   </section>
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-06 14:39" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-01-07 11:24" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="674de30dfcd4554752a5b15f1e031e90"/>
+      <fingerprint md5="3d75945e3740805ffce06025f5db0f3d"/>
     </file>
   </section>
   <section name="targets">
