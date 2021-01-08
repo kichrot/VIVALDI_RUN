@@ -48,6 +48,43 @@ Procedure ChangeProcessPriority(Priority)
     SetPriorityClass_(  GetCurrentProcess_(), Priority)
 EndProcedure
 
+; Процедура эмуляции нажатия сочетания клавиш
+Procedure keyb_ev(KEYUPDelay, KodeKey_1, KodeKey_2=0, KodeKey_3=0, KodeKey_4=0, KodeKey_5=0, KodeKey_6=0)
+    keybd_event_(KodeKey_1, 0, 0, 0)
+    If KodeKey_2>0
+        keybd_event_(KodeKey_2, 0, 0, 0)
+        If KodeKey_3>0
+            keybd_event_(KodeKey_3, 0, 0, 0)
+            If KodeKey_4>0
+                keybd_event_(KodeKey_4, 0, 0, 0)
+                If KodeKey_5>0
+                    keybd_event_(KodeKey_5, 0, 0, 0)
+                    If KodeKey_6>0
+                        keybd_event_(KodeKey_6, 0, 0, 0)
+                    EndIf
+                EndIf
+            EndIf
+        EndIf
+    EndIf    
+    Delay(KEYUPDelay)
+    keybd_event_(KodeKey_1, 0, #KEYEVENTF_KEYUP, 0)
+    If KodeKey_2>0
+        keybd_event_(KodeKey_2, 0, #KEYEVENTF_KEYUP, 0)
+        If KodeKey_3>0
+            keybd_event_(KodeKey_3, 0, #KEYEVENTF_KEYUP, 0)
+            If KodeKey_4>0
+                keybd_event_(KodeKey_4, 0, #KEYEVENTF_KEYUP, 0)
+                If KodeKey_5>0
+                    keybd_event_(KodeKey_5, 0, #KEYEVENTF_KEYUP, 0)
+                    If KodeKey_6>0
+                        keybd_event_(KodeKey_6, 0, #KEYEVENTF_KEYUP, 0)
+                    EndIf
+                EndIf
+            EndIf
+        EndIf
+    EndIf    
+EndProcedure
+
 ; Процедура запуска внешнего приложения WINDOWS, с выводом окна на передний план
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
     Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
@@ -231,20 +268,13 @@ Procedure VivaldiWndEnumWait()
     ForEver
 EndProcedure
 
-
 ; Процедура перехода на страницу по адресу из буфера обмена
 Procedure VivaldiClipboardAddress(Address.s)
     Protected ClipboardText.s
     ClipboardText=GetClipboardText()
     SetClipboardText(Address)
     Delay(100)
-    keybd_event_(17 , 0, 0, 0)
-    keybd_event_(16 , 0, 0, 0)
-    keybd_event_(86 , 0, 0, 0)
-    Delay(70)
-    keybd_event_(86 , 0, #KEYEVENTF_KEYUP, 0)
-    keybd_event_(16 , 0, #KEYEVENTF_KEYUP, 0)
-    keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+    keyb_ev(70, 17, 16, 86)
     Delay(1000)
     SetClipboardText(ClipboardText)
     ClipboardText=""
@@ -270,15 +300,11 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             CountKodeKey=ExtractRegularExpression(1, name, VirtKeyCode.s())
             If GetKeyState_(#VK_NUMLOCK)=1
                 OnNumLock=1
-                keybd_event_(#VK_NUMLOCK, 0, 0, 0 );
-                Delay(50)
-                keybd_event_(#VK_NUMLOCK, 0, #KEYEVENTF_KEYUP, 0); 
+                keyb_ev(50, #VK_NUMLOCK)
             EndIf
             If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36)
                 ; перевод фокуса на страницу
-                keybd_event_(120, 0, 0, 0 );
-                Delay(100)
-                keybd_event_(120, 0, #KEYEVENTF_KEYUP, 0);
+                keyb_ev(100, 120)
             EndIf
             If CountKodeKey=1 And Val(VirtKeyCode(0))=0
                 ; Реализация рестарта VIVALDI
@@ -301,14 +327,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                         Else 
                             counter=0
                             Delay(300)
-                            keybd_event_(123 , 0, 0, 0)
-                            Delay(10)
-                            keybd_event_(123 , 0, #KEYEVENTF_KEYUP, 0)
-                            keybd_event_(17 , 0, 0, 0)
-                            keybd_event_(87 , 0, 0, 0)
-                            Delay(10)
-                            keybd_event_(87 , 0, #KEYEVENTF_KEYUP, 0)
-                            keybd_event_(17 , 0, #KEYEVENTF_KEYUP, 0)
+                            keyb_ev(10, 123)
+                            keyb_ev(10, 17, 87)
                             Break    
                         EndIf
                         If counter=600
@@ -352,9 +372,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 keybd_event_(Val(VirtKeyCode(k)), 0, #KEYEVENTF_KEYUP, 0)
             Next
             If OnNumLock=1
-                keybd_event_(#VK_NUMLOCK, 0, 0, 0 );
-                Delay(50)
-                keybd_event_(#VK_NUMLOCK, 0, #KEYEVENTF_KEYUP, 0);
+                keyb_ev(50, #VK_NUMLOCK)
             EndIf
         Else
             FreeRegularExpression(1)
@@ -406,8 +424,7 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 349
-; FirstLine = 115
-; Folding = A1
+; CursorPosition = 5
+; Folding = Ag
 ; EnableXP
 ; CompileSourceDirectory
