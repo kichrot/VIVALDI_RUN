@@ -85,6 +85,30 @@ Procedure keyb_ev(KEYUPDelay, KodeKey_1, KodeKey_2=0, KodeKey_3=0, KodeKey_4=0, 
     EndIf    
 EndProcedure
 
+; Процедура принудительного вывода окна на передний план
+Procedure SetForegroundWindow(hWnd) 
+    If GetWindowLong_(hWnd, #GWL_STYLE) & #WS_MINIMIZE 
+        ShowWindow_(hWnd, #SW_MAXIMIZE) 
+        UpdateWindow_(hWnd) 
+    EndIf 
+    foregroundThreadID = GetWindowThreadProcessId_(GetForegroundWindow_(), 0) 
+    ourThreadID = GetCurrentThreadId_() 
+    If (foregroundThreadID <> ourThreadID) 
+        AttachThreadInput_(foregroundThreadID, ourThreadID, #True); 
+    EndIf 
+    SetForegroundWindow_(hWnd) 
+    If (foregroundThreadID <> ourThreadID) 
+        AttachThreadInput_(foregroundThreadID, ourThreadID, #False) 
+    EndIf   
+    InvalidateRect_(hWnd, #Null, #True)
+    
+    ;запасной рабочий но костыльный вариант процедуры
+    ;     keybd_event_(18 , 0, 0, 0)
+    ;     SetForegroundWindow_(hWnd)
+    ;     Delay(70)
+    ;     keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+EndProcedure  
+
 ; Процедура запуска внешнего приложения WINDOWS, с выводом окна на передний план
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
     Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
@@ -108,10 +132,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
                         GetWindowThreadProcessId_(hWnd, @pid)
                         hWndForeground=GetForegroundWindow_()
                         If RunProgramPID=pid And hWnd<>hWndForeground
-                            keybd_event_(18 , 0, 0, 0)
-                            SetForegroundWindow_(hWnd)
-                            Delay(70)
-                            keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+                            SetForegroundWindow(hWnd)
                             SetActiveWindow_(hWnd)
                             hWndProg=1
                             Break
@@ -424,7 +445,8 @@ EnableExplicit
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 5
-; Folding = Ag
+; CursorPosition = 102
+; FirstLine = 22
+; Folding = wA-
 ; EnableXP
 ; CompileSourceDirectory
