@@ -5,6 +5,10 @@
 
 ; ////////////////// Процедуры и функции ////////////////////////////
 
+; глобальная переменная о состоянии автоскрытия панели задач. с которым был запущен VIVALDI
+; 0 - автоскрытие выключено, 1 - автоскрытие включено
+Global AutoHideTrayWnd=0
+
 ; Процедура чтения файла (возвращает содержимое в виде строки)
 Procedure.s LoadFromFile(File.s)
     Protected OpFile,StringFormat,String.s,Strings.s
@@ -41,11 +45,53 @@ Procedure CheckRun(FileName.s)
     EndIf
 EndProcedure
 
-; Процедура изменения приоритета собственного процесса программы Vivaldi_Run
-Procedure ChangeProcessPriority(Priority) 
+; Процедура изменения приоритета собственного процесса программы Vivaldi_Run 
+Procedure ChangeProcessPriority(Priority)
+    
     ; меняем приоритет своего процесса
     SetThreadPriority_( GetCurrentThread_() , #THREAD_BASE_PRIORITY_MAX)
     SetPriorityClass_(  GetCurrentProcess_(), Priority)
+EndProcedure
+
+; Процедура определения значения глобальной переменной AutoHideTrayWnd
+;(состоянии автоскрытия панели задач. с которым был запущен VIVALDI)
+Procedure Set_AutoHideTrayWnd()
+    #ABM_SETSTATE = 10
+    aBdata.AppBarData
+    aBdata\cbsize = SizeOf(AppBarData)
+    If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
+        AutoHideTrayWnd=1 
+    Else
+        AutoHideTrayWnd=0 
+    EndIf
+EndProcedure
+
+
+; Процедура перевода панели задач в режим автоскрытия 
+Procedure TrayWndAutoHide(AutoHide=1)
+    #ABM_SETSTATE = 10
+    aBdata.AppBarData
+    aBdata\cbsize = SizeOf(AppBarData)
+    If AutoHide=1
+        If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
+            aBdata\lparam = #ABS_ALWAYSONTOP
+            SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
+        Else
+            aBdata\lparam = #ABS_AUTOHIDE
+            SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
+            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_HIDE)
+            Delay(30)
+            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_SHOW)
+        EndIf
+    Else
+        If AutoHideTrayWnd=0
+            aBdata\lparam = #ABS_ALWAYSONTOP
+            SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
+        Else
+            aBdata\lparam = #ABS_AUTOHIDE
+            SHAppBarMessage_(#ABM_SETSTATE, @aBdata) 
+        EndIf  
+    EndIf
 EndProcedure
 
 ; Процедура эмуляции нажатия сочетания клавиш
@@ -154,6 +200,9 @@ EndProcedure
 Procedure RunVIVALDI(Command_Line_P.s)
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
     Protected Dim ParamVivaldi_Run.s(0)
+    
+    ; заполняем глобальную переменную AutoHideTrayWnd
+    Set_AutoHideTrayWnd()
     
     If Command_Line_P=""
         ; меняем приоритет своего процесса
@@ -384,6 +433,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 ExtractRegularExpression(2, name, PageAddress())
                 RunVIVALDI(PageAddress(0))
                 FreeRegularExpression(2)
+            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=22
+                TrayWndAutoHide(1)
             EndIf
             For k = 0 To CountKodeKey-1
                 keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
@@ -426,6 +477,11 @@ Procedure VivaldiKodeKeyWait()
             Else
                 Delay(30)
             EndIf
+            ; Возвращаем панель задач в исходное состояние
+            hWnd=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
+            If IsWindowVisible_(hWnd)=0
+                TrayWndAutoHide(0)
+            EndIf
         Until counter=300
         ; ищем/ожидаем окно VIVALDI
         VivaldiWndEnumWait()
@@ -441,12 +497,12 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 
-EnableExplicit
+
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 102
-; FirstLine = 22
-; Folding = wA-
+; CursorPosition = 492
+; FirstLine = 34
+; Folding = AA9
 ; EnableXP
 ; CompileSourceDirectory
