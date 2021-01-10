@@ -201,10 +201,9 @@ Procedure RunVIVALDI(Command_Line_P.s)
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
     Protected Dim ParamVivaldi_Run.s(0)
     
-    ; заполняем глобальную переменную AutoHideTrayWnd
-    Set_AutoHideTrayWnd()
-    
     If Command_Line_P=""
+        ; заполняем глобальную переменную AutoHideTrayWnd
+        Set_AutoHideTrayWnd()
         ; меняем приоритет своего процесса
         ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
         
@@ -332,7 +331,6 @@ Procedure VivaldiWndEnumWait()
             Break    
         EndIf
         If counter=3000 
-            ;             MessageRequester("Vivaldi_Run", "Закрытие", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
@@ -501,8 +499,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 492
-; FirstLine = 34
+; CursorPosition = 488
+; FirstLine = 36
 ; Folding = AA9
 ; EnableXP
 ; CompileSourceDirectory
