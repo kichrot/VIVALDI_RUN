@@ -370,7 +370,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 OnNumLock=1
                 keyb_ev(50, #VK_NUMLOCK)
             EndIf
-            If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36)
+            If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36 Or Val(VirtKeyCode(0))=22)
                 ; перевод фокуса на страницу
                 keyb_ev(100, 120)
             EndIf
@@ -432,6 +432,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 RunVIVALDI(PageAddress(0))
                 FreeRegularExpression(2)
             ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=22
+                ; включение/выключение автоскрытия панели задач
                 TrayWndAutoHide(1)
             EndIf
             For k = 0 To CountKodeKey-1
@@ -499,7 +500,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 488
+; CursorPosition = 489
 ; FirstLine = 36
 ; Folding = AA9
 ; EnableXP
