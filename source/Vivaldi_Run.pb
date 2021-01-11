@@ -465,20 +465,23 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counter
+    Protected counter, count
     Repeat 
         counter=0
         Repeat
-            counter=counter+1 
-            ; ищем и окно VIVALDI  с кодом клавиш и получаем коды
-            If VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s", "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")=1
-                Delay(500)
-            Else
-                Delay(30)
-            EndIf
-            ; Возвращаем панель задач в исходное состояние
-            hWnd=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
-            If IsWindowVisible_(hWnd)=0
+            counter=counter+1
+            count=0
+            Repeat
+                count=count+1   
+                ; ищем и окно VIVALDI  с кодом клавиш и получаем коды
+                If VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s", "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")=1
+                    Delay(500)
+                Else
+                    Delay(30)
+                EndIf
+            Until count=30
+            ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
+            If IsWindowVisible_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
                 TrayWndAutoHide(0)
             EndIf
         Until counter=300
@@ -500,8 +503,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 489
-; FirstLine = 36
+; CursorPosition = 492
+; FirstLine = 37
 ; Folding = AA9
 ; EnableXP
 ; CompileSourceDirectory
