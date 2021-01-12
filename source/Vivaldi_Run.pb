@@ -46,11 +46,20 @@ Procedure CheckRun(FileName.s)
 EndProcedure
 
 ; Процедура изменения приоритета собственного процесса программы Vivaldi_Run 
-Procedure ChangeProcessPriority(Priority)
-    
+Procedure ChangeProcessPriorityVivaldi_Run(Priority)
     ; меняем приоритет своего процесса
     SetThreadPriority_( GetCurrentThread_() , #THREAD_BASE_PRIORITY_MAX)
     SetPriorityClass_(  GetCurrentProcess_(), Priority)
+EndProcedure
+
+; Процедура изменения приоритета процесса окна Vivaldi находящегося на переднем плане
+Procedure ChangeProcessPriorityVivaldi(Priority)
+    Protected ThreadProcessId, HandleProcess
+    ThreadProcessId=GetWindowThreadProcessId_(GetForegroundWindow_(), 0)
+    SetThreadPriority_(ThreadProcessId , #THREAD_BASE_PRIORITY_MAX)
+    HandleProcess=OpenProcess_(#PROCESS_SET_INFORMATION, #False, ThreadProcessId)
+    SetPriorityClass_(HandleProcess, Priority)
+    CloseHandle_(HandleProcess)
 EndProcedure
 
 ; Процедура определения значения глобальной переменной AutoHideTrayWnd
@@ -66,10 +75,9 @@ Procedure Set_AutoHideTrayWnd()
     EndIf
 EndProcedure
 
-
 ; Процедура перевода панели задач в режим автоскрытия 
 Procedure TrayWndAutoHide(AutoHide=1)
-    ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
+    ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
     #ABM_SETSTATE = 10
     aBdata.AppBarData
     aBdata\cbsize = SizeOf(AppBarData)
@@ -93,7 +101,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata) 
         EndIf  
     EndIf
-    ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+    ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
 
 ; Процедура эмуляции нажатия сочетания клавиш
@@ -207,7 +215,7 @@ Procedure RunVIVALDI(Command_Line_P.s)
         ; заполняем глобальную переменную AutoHideTrayWnd
         Set_AutoHideTrayWnd()
         ; меняем приоритет своего процесса
-        ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
         
         ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
         SetCurrentDirectory(GetPathPart(ProgramFilename())) 
@@ -253,7 +261,7 @@ Procedure RunVIVALDI(Command_Line_P.s)
         CheckRun("Vivaldi_Run.exe")
         
         ; меняем приоритет своего процесса
-        ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
     EndIf
 EndProcedure
 
@@ -363,7 +371,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
-        ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi(#HIGH_PRIORITY_CLASS)
         CreateRegularExpression(1, VirtKeyRegExp)
         GetWindowText_(hWnd, @name, 256)
         If MatchRegularExpression(1, name)
@@ -455,11 +464,14 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             EndIf
         Else
             FreeRegularExpression(1)
-            ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+            ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
+            ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
+            
             ProcedureReturn 0   
         EndIf   
     Else
-        ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
         ProcedureReturn 0
     EndIf
     GetWindowText_(hWnd, @name2, 256)
@@ -467,7 +479,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
         SetWindowText_(hWnd,"  - Vivaldi")
     EndIf    
     FreeRegularExpression(1)
-    ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
+    ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
+    ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
     ProcedureReturn 1 
 EndProcedure
 
@@ -487,10 +500,12 @@ Procedure VivaldiKodeKeyWait()
                 Else
                     Delay(30)
                 EndIf
-            Until count=10
+            Until count=20
             ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
-            If IsWindowVisible_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
+            ;If IsWindowVisible_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
+            If IsWindow_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
                 TrayWndAutoHide(0)
+                Break
             EndIf
         Until counter=300
         ; ищем/ожидаем окно VIVALDI
@@ -511,8 +526,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 499
-; FirstLine = 42
-; Folding = AA9
+; CursorPosition = 515
+; FirstLine = 45
+; Folding = AA5
 ; EnableXP
 ; CompileSourceDirectory
