@@ -69,6 +69,7 @@ EndProcedure
 
 ; Процедура перевода панели задач в режим автоскрытия 
 Procedure TrayWndAutoHide(AutoHide=1)
+    ChangeProcessPriority(#HIGH_PRIORITY_CLASS)
     #ABM_SETSTATE = 10
     aBdata.AppBarData
     aBdata\cbsize = SizeOf(AppBarData)
@@ -92,10 +93,11 @@ Procedure TrayWndAutoHide(AutoHide=1)
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata) 
         EndIf  
     EndIf
+    ChangeProcessPriority(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
 
 ; Процедура эмуляции нажатия сочетания клавиш
-Procedure keyb_ev(KEYUPDelay, KodeKey_1, KodeKey_2=0, KodeKey_3=0, KodeKey_4=0, KodeKey_5=0, KodeKey_6=0)
+Procedure KeybdEvent(KEYUPDelay, KodeKey_1, KodeKey_2=0, KodeKey_3=0, KodeKey_4=0, KodeKey_5=0, KodeKey_6=0)
     keybd_event_(KodeKey_1, 0, 0, 0)
     If KodeKey_2>0
         keybd_event_(KodeKey_2, 0, 0, 0)
@@ -342,7 +344,7 @@ Procedure VivaldiClipboardAddress(Address.s)
     ClipboardText=GetClipboardText()
     SetClipboardText(Address)
     Delay(100)
-    keyb_ev(70, 17, 16, 86)
+    KeybdEvent(70, 17, 16, 86)
     Delay(1000)
     SetClipboardText(ClipboardText)
     ClipboardText=""
@@ -368,82 +370,88 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
             CountKodeKey=ExtractRegularExpression(1, name, VirtKeyCode.s())
             If GetKeyState_(#VK_NUMLOCK)=1
                 OnNumLock=1
-                keyb_ev(50, #VK_NUMLOCK)
+                KeybdEvent(50, #VK_NUMLOCK)
             EndIf
-            If CountKodeKey=1 And (Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36 Or Val(VirtKeyCode(0))=22)
-                ; перевод фокуса на страницу
-                keyb_ev(100, 120)
-            EndIf
-            If CountKodeKey=1 And Val(VirtKeyCode(0))=0
-                ; Реализация рестарта VIVALDI
-                VivaldiClipboardAddress("vivaldi://restart")
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=7
-                ; Открыть DevTools для интерфейса VIVALDI 
-                Protected counter=0
-                hWndDevTool=0
-                If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
-                    hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
-                    SetForegroundWindow_(hWndDevTool)
-                    SetActiveWindow_(hWndDevTool)
+            If CountKodeKey=1
+                If Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36 Or Val(VirtKeyCode(0))=22
+                    ; перевод фокуса на страницу
+                    KeybdEvent(100, 120)
+                EndIf
+                If Val(VirtKeyCode(0))=0
+                    ; Реализация рестарта VIVALDI
+                    VivaldiClipboardAddress("vivaldi://restart")
+                ElseIf Val(VirtKeyCode(0))=7
+                    ; Открыть DevTools для интерфейса VIVALDI 
+                    Protected counter=0
+                    hWndDevTool=0
+                    If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
+                        hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
+                        SetForegroundWindow_(hWndDevTool)
+                        SetActiveWindow_(hWndDevTool)
+                    Else
+                        RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
+                        counter=0
+                        Repeat 
+                            If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
+                                counter=counter+1
+                                Delay(5)
+                            Else 
+                                counter=0
+                                Delay(300)
+                                KeybdEvent(10, 123)
+                                KeybdEvent(10, 17, 87)
+                                Break    
+                            EndIf
+                            If counter=600
+                                Break
+                            EndIf
+                        ForEver
+                    EndIf
+                ElseIf Val(VirtKeyCode(0))=10
+                    ; Переход на стартовую страницу VIVALDI в текущей вкладке
+                    VivaldiClipboardAddress("vivaldi://startpage")
+                ElseIf Val(VirtKeyCode(0))=11
+                    ; Реализация кнопки запуска программ WINDOWS
+                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    CountCommandLineParameters=ExtractRegularExpression(2, name, CommandLineParameters())
+                    If CountCommandLineParameters=1
+                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "")
+                    ElseIf  CountCommandLineParameters>1 
+                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
+                    EndIf
+                    FreeRegularExpression(2)
+                ElseIf Val(VirtKeyCode(0))=14
+                    ; Открытие страницы, по заданному адресу, в текущей вкладке
+                    ClipboardText=GetClipboardText()
+                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    ExtractRegularExpression(2, name, PageAddress())
+                    Delay(100)
+                    VivaldiClipboardAddress(PageAddress(0))
+                    FreeRegularExpression(2)
+                ElseIf Val(VirtKeyCode(0))=15
+                    ; Открытие страницы, по заданному адресу, в новой вкладке
+                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    ExtractRegularExpression(2, name, PageAddress())
+                    RunVIVALDI(PageAddress(0))
+                    FreeRegularExpression(2)
+                ElseIf Val(VirtKeyCode(0))=22
+                    ; включение/выключение автоскрытия панели задач
+                    TrayWndAutoHide(1)
                 Else
-                    RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
-                    counter=0
-                    Repeat 
-                        If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
-                            counter=counter+1
-                            Delay(5)
-                        Else 
-                            counter=0
-                            Delay(300)
-                            keyb_ev(10, 123)
-                            keyb_ev(10, 17, 87)
-                            Break    
-                        EndIf
-                        If counter=600
-                            Break
-                        EndIf
-                    ForEver
+                    ; стандартные кнопки
+                    KeybdEvent(50, Val(VirtKeyCode(k)))
                 EndIf
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=10
-                ; Переход на стартовую страницу VIVALDI в текущей вкладке
-                VivaldiClipboardAddress("vivaldi://startpage")
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=11
-                ; Реализация кнопки запуска программ WINDOWS
-                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                CountCommandLineParameters=ExtractRegularExpression(2, name, CommandLineParameters())
-                If CountCommandLineParameters=1
-                    LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "")
-                ElseIf  CountCommandLineParameters>1 
-                    LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
-                EndIf
-                FreeRegularExpression(2)
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=14
-                ; Открытие страницы, по заданному адресу, в текущей вкладке
-                ClipboardText=GetClipboardText()
-                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                ExtractRegularExpression(2, name, PageAddress())
+            Else    
+                For k = 0 To CountKodeKey-1
+                    keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
+                Next
                 Delay(100)
-                VivaldiClipboardAddress(PageAddress(0))
-                FreeRegularExpression(2)
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=15
-                ; Открытие страницы, по заданному адресу, в новой вкладке
-                CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                ExtractRegularExpression(2, name, PageAddress())
-                RunVIVALDI(PageAddress(0))
-                FreeRegularExpression(2)
-            ElseIf CountKodeKey=1 And Val(VirtKeyCode(0))=22
-                ; включение/выключение автоскрытия панели задач
-                TrayWndAutoHide(1)
+                For k=CountKodeKey-1 To 0 Step -1
+                    keybd_event_(Val(VirtKeyCode(k)), 0, #KEYEVENTF_KEYUP, 0)
+                Next
             EndIf
-            For k = 0 To CountKodeKey-1
-                keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
-            Next
-            Delay(100)
-            For k=CountKodeKey-1 To 0 Step -1
-                keybd_event_(Val(VirtKeyCode(k)), 0, #KEYEVENTF_KEYUP, 0)
-            Next
             If OnNumLock=1
-                keyb_ev(50, #VK_NUMLOCK)
+                KeybdEvent(50, #VK_NUMLOCK)
             EndIf
         Else
             FreeRegularExpression(1)
@@ -479,7 +487,7 @@ Procedure VivaldiKodeKeyWait()
                 Else
                     Delay(30)
                 EndIf
-            Until count=30
+            Until count=10
             ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
             If IsWindowVisible_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
                 TrayWndAutoHide(0)
@@ -503,8 +511,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 492
-; FirstLine = 37
+; CursorPosition = 499
+; FirstLine = 42
 ; Folding = AA9
 ; EnableXP
 ; CompileSourceDirectory

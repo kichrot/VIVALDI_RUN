@@ -7,12 +7,12 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-11 12:50" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-01-12 15:09" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="48ef7fc24c892f20e05e635629330a63"/>
+      <fingerprint md5="38922e7a79b042c9802e962d0e3a1500"/>
     </file>
   </section>
   <section name="targets">
