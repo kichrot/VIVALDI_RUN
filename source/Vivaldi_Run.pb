@@ -279,6 +279,7 @@ Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s)
     
     Protected Flag,hWnd,return_proc
     CreateRegularExpression(0, TextTitleRegExp)
+    Sleep_(0)
     If  WndForeground="Y"
         hWnd = GetForegroundWindow_()
         clas.s= Space(256) 
@@ -292,6 +293,7 @@ Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s)
         EndIf
     Else
         Repeat
+            Sleep_(0)
             If Flag=0
                 hWnd = FindWindow_( 0, 0 )
                 Flag=1
@@ -321,6 +323,7 @@ Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s)
             ProcedureReturn 0  
         EndIf
     EndIf
+    Sleep_(0)
     FreeRegularExpression(0)
     If return_proc>0
         ProcedureReturn return_proc  
@@ -333,7 +336,8 @@ EndProcedure
 Procedure VivaldiWndEnumWait()
     
     Protected counter=0
-    Repeat    
+    Repeat 
+        Sleep_(0)
         If WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")=0
             counter=counter+1
             Delay(40)
@@ -500,14 +504,15 @@ Procedure VivaldiKodeKeyWait()
                 Else
                     Delay(30)
                 EndIf
-            Until count=20
+            Until count=30
             ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
-            ;If IsWindowVisible_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
+            Sleep_(0)
             If IsWindow_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
                 TrayWndAutoHide(0)
                 Break
             EndIf
-        Until counter=300
+            Sleep_(30)
+        ForEver
         ; ищем/ожидаем окно VIVALDI
         VivaldiWndEnumWait()
     ForEver
@@ -521,13 +526,9 @@ RunVIVALDI("")
 
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
-
-
-
-
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 515
-; FirstLine = 45
+; CursorPosition = 520
+; FirstLine = 42
 ; Folding = AA5
 ; EnableXP
 ; CompileSourceDirectory
