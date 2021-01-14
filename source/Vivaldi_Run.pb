@@ -57,7 +57,7 @@ Procedure ChangeProcessPriorityVivaldi(Priority)
     Protected ThreadProcessId, HandleProcess
     ThreadProcessId=GetWindowThreadProcessId_(GetForegroundWindow_(), 0)
     SetThreadPriority_(ThreadProcessId , #THREAD_BASE_PRIORITY_MAX)
-    HandleProcess=OpenProcess_(#PROCESS_SET_INFORMATION, #False, ThreadProcessId)
+    HandleProcess=OpenProcess_(#PROCESS_DUP_HANDLE | #PROCESS_SET_INFORMATION, #True, ThreadProcessId)
     SetPriorityClass_(HandleProcess, Priority)
     CloseHandle_(HandleProcess)
 EndProcedure
@@ -334,11 +334,11 @@ EndProcedure
 
 ; Процедура проверки наличия и ожидания окон VIVALDI
 Procedure VivaldiWndEnumWait()
-    
-    Protected counter=0
+    Protected counter=0, hWnd=0
     Repeat 
         Sleep_(0)
-        If WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")=0
+        hWnd=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
+        If hWnd=0
             counter=counter+1
             Delay(40)
         Else 
@@ -348,6 +348,7 @@ Procedure VivaldiWndEnumWait()
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
+    ProcedureReturn hWnd
 EndProcedure
 
 ; Процедура перехода на страницу по адресу из буфера обмена
@@ -490,7 +491,8 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counter, count
+    Protected counter, count, hWnd=0
+    hWnd=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
     Repeat 
         counter=0
         Repeat
@@ -507,14 +509,14 @@ Procedure VivaldiKodeKeyWait()
             Until count=30
             ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
             Sleep_(0)
-            If IsWindow_(WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N"))=0
+            If IsWindow_(hWnd)=0
                 TrayWndAutoHide(0)
                 Break
             EndIf
             Sleep_(30)
         ForEver
         ; ищем/ожидаем окно VIVALDI
-        VivaldiWndEnumWait()
+        hWnd=VivaldiWndEnumWait()
     ForEver
 EndProcedure
 
@@ -527,8 +529,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 520
-; FirstLine = 42
+; CursorPosition = 522
+; FirstLine = 39
 ; Folding = AA5
 ; EnableXP
 ; CompileSourceDirectory
