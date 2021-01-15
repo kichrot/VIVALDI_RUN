@@ -9,6 +9,78 @@
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
 Global AutoHideTrayWnd=0
 
+; Прототипы функций для работы с процессами 
+Prototype ProcessFirst(Snapshot, Process)
+Prototype ProcessNext(Snapshot, Process)
+
+; Процедура закрытия процесса по PID
+Procedure KillProcess(Pid) 
+    phandle = OpenProcess_ (#PROCESS_TERMINATE, #False, Pid) 
+    If phandle <> #Null 
+        If TerminateProcess_ (phandle, 1) 
+            Result = #True 
+        EndIf 
+        CloseHandle_ (phandle) 
+    EndIf 
+    ProcedureReturn Result 
+EndProcedure 
+
+; Процедура поиска и закрытия экземпляра Vivaldi_Run запущенного ранее
+Procedure KillProcessSecondVivaldi_Run(Name.s="Vivaldi_Run.exe")
+    Protected ProcessFirst.ProcessFirst
+    Protected ProcessNext.ProcessNext
+    Protected ProcLib
+    Protected ProcName.s
+    Protected Process.PROCESSENTRY32
+    Protected x
+    Protected retval=#False
+    Name=UCase(Name.s)
+    ProcLib= OpenLibrary(#PB_Any, "Kernel32.dll") 
+    If ProcLib
+        CompilerIf #PB_Compiler_Unicode
+            ProcessFirst = GetFunction(ProcLib, "Process32FirstW") 
+            ProcessNext  = GetFunction(ProcLib, "Process32NextW") 
+        CompilerElse
+            ProcessFirst = GetFunction(ProcLib, "Process32First") 
+            ProcessNext  = GetFunction(ProcLib, "Process32Next") 
+        CompilerEndIf
+        If  ProcessFirst And ProcessNext 
+            Process\dwSize = SizeOf(PROCESSENTRY32) 
+            Snapshot =CreateToolhelp32Snapshot_(#TH32CS_SNAPALL,0)
+            If Snapshot 
+                ProcessFound = ProcessFirst(Snapshot, Process) 
+                x=1
+                While ProcessFound 
+                    ProcName=PeekS(@Process\szExeFile)
+                    ProcName=GetFilePart(ProcName)
+                    If UCase(ProcName)=UCase(Name) 
+                        ret=Process\th32ProcessID
+                        If ret<>GetCurrentProcessId_()
+                            KillProcess(ret) 
+                            Break
+                        EndIf
+                    EndIf
+                    ProcessFound = ProcessNext(Snapshot, Process) 
+                    x=x+1  
+                Wend 
+            EndIf 
+            CloseHandle_(Snapshot) 
+        EndIf 
+        CloseLibrary(ProcLib) 
+    EndIf 
+    ;ProcedureReturn ret
+EndProcedure
+
+; Процедура проверки повторного запуска Vivaldi_Run
+Procedure CheckRun(FileName.s) 
+    *a = CreateSemaphore_(0, 0, 1, FileName)
+    If *a <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
+        CloseHandle_(*a)
+        KillProcessSecondVivaldi_Run("Vivaldi_Run.exe")
+        *a = CreateSemaphore_(0, 0, 1, FileName)
+    EndIf
+EndProcedure
+
 ; Процедура чтения файла (возвращает содержимое в виде строки)
 Procedure.s LoadFromFile(File.s)
     Protected OpFile,StringFormat,String.s,Strings.s
@@ -35,15 +107,6 @@ Procedure.s LoadFromFile(File.s)
         End ; Завершение работы программы
     EndIf
 EndProcedure 
-
-; Процедура запрета повторного запуска VIVALDI
-Procedure CheckRun(FileName.s) 
-    *a = CreateSemaphore_(0, 0, 1, FileName)
-    If *a <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
-        CloseHandle_(*a)
-        End
-    EndIf
-EndProcedure
 
 ; Процедура изменения приоритета собственного процесса программы Vivaldi_Run 
 Procedure ChangeProcessPriorityVivaldi_Run(Priority)
@@ -528,8 +591,7 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 521
-; FirstLine = 37
-; Folding = AA5
+; CursorPosition = 584
+; Folding = AAg
 ; EnableXP
 ; CompileSourceDirectory
