@@ -155,20 +155,26 @@ Procedure Set_AutoHideTrayWnd()
     #ABM_SETSTATE = 10
     aBdata.AppBarData
     aBdata\cbsize = SizeOf(AppBarData)
-    ; проверка существования семафора, что режим автоскрытия панели задач в WINDOWS выключен
+    ; проверка существования семафорjd, что режим автоскрытия панели задач в WINDOWS выключен/включен
+    *a = CreateSemaphore_(0, 0, 1, "AutoHideTrayWnd")
     *b = CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
     If *b <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
-        CloseHandle_(*b)
-        AutoHideTrayWnd=0   
+        AutoHideTrayWnd=0 
+    ElseIf *a <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
+        AutoHideTrayWnd=1
     Else
         If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
-            AutoHideTrayWnd=1 
+            AutoHideTrayWnd=1
+            ; создание семафора, что режим автоскрытия панели задач в WINDOWS включен
+            CreateSemaphore_(0, 0, 1, "AutoHideTrayWnd")
         Else
             AutoHideTrayWnd=0 
             ; создание семафора, что режим автоскрытия панели задач в WINDOWS выключен
-            *b = CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
+            CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
         EndIf
     EndIf
+    CloseHandle_(*a)
+    CloseHandle_(*b)
 EndProcedure
 
 ; Процедура перевода панели задач в режим автоскрытия 
@@ -643,7 +649,7 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 636
+; CursorPosition = 642
 ; FirstLine = 54
 ; Folding = AAA-
 ; EnableXP
