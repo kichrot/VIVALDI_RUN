@@ -150,15 +150,24 @@ Procedure ChangeProcessPriorityVivaldi(Priority)
 EndProcedure
 
 ; Процедура определения значения глобальной переменной AutoHideTrayWnd
-;(состоянии автоскрытия панели задач. с которым был запущен VIVALDI)
+;(состоянии автоскрытия панели задач, с которым был запущен VIVALDI)
 Procedure Set_AutoHideTrayWnd()
     #ABM_SETSTATE = 10
     aBdata.AppBarData
     aBdata\cbsize = SizeOf(AppBarData)
-    If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
-        AutoHideTrayWnd=1 
+    ; проверка существования семафора, что режим автоскрытия панели задач в WINDOWS выключен
+    *b = CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
+    If *b <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
+        CloseHandle_(*b)
+        AutoHideTrayWnd=0   
     Else
-        AutoHideTrayWnd=0 
+        If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
+            AutoHideTrayWnd=1 
+        Else
+            AutoHideTrayWnd=0 
+            ; создание семафора, что режим автоскрытия панели задач в WINDOWS выключен
+            *b = CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
+        EndIf
     EndIf
 EndProcedure
 
@@ -634,8 +643,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 627
-; FirstLine = 55
+; CursorPosition = 636
+; FirstLine = 54
 ; Folding = AAA-
 ; EnableXP
 ; CompileSourceDirectory
