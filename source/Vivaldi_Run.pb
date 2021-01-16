@@ -9,6 +9,9 @@
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
 Global AutoHideTrayWnd=0
 
+; глобальная переменная содержащая имя файла с параметрами командной строки VIVALDI
+Global NameFileCommandLineVivaldi.s="VIVALDI_COMMAND_LINE.txt"
+
 ; Прототипы функций для работы с процессами 
 Prototype ProcessFirst(Snapshot, Process)
 Prototype ProcessNext(Snapshot, Process)
@@ -71,13 +74,34 @@ Procedure KillProcessSecondVivaldi_Run(Name.s="Vivaldi_Run.exe")
     ;ProcedureReturn ret
 EndProcedure
 
+; Проверяем наличие в параметрах коммандной строки параметра управления Vivaldi_Run
+Procedure.s CheckParametr(Command_Line.s, Parametr.s)
+    Protected Dim ParamVivaldi_Run.s(0)
+    CreateRegularExpression(3, Parametr)
+    CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
+    If CountParamVivaldi_Run>0
+        ProcedureReturn ParamVivaldi_Run(0)
+    Else
+       ProcedureReturn ""
+   EndIf  
+   FreeRegularExpression(3)
+EndProcedure
+    
 ; Процедура проверки повторного запуска Vivaldi_Run
 Procedure CheckRun(FileName.s) 
+    Protected Command_Line_Vivaldi_Run.s, ParametrRFCLP.s=""
+    ; Получаем параметры командной строки для файла Vivaldi_Run.exe
+    Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
+    ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
     *a = CreateSemaphore_(0, 0, 1, FileName)
     If *a <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
         CloseHandle_(*a)
-        KillProcessSecondVivaldi_Run("Vivaldi_Run.exe")
-        *a = CreateSemaphore_(0, 0, 1, FileName)
+        If ParametrRFCLP<>""
+            KillProcessSecondVivaldi_Run(FileName)
+            *a = CreateSemaphore_(0, 0, 1, FileName)
+        ElseIf ParametrRFCLP=""
+            End
+        EndIf
     EndIf
 EndProcedure
 
@@ -271,8 +295,9 @@ EndProcedure
 
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI(Command_Line_P.s)
-    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
+    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run, ParametrRFCLP.s=""
     Protected Dim ParamVivaldi_Run.s(0)
+    Protected Dim FileNameCommandLineVivaldi.s(0)
     
     If Command_Line_P=""
         ; заполняем глобальную переменную AutoHideTrayWnd
@@ -282,20 +307,32 @@ Procedure RunVIVALDI(Command_Line_P.s)
         
         ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
         SetCurrentDirectory(GetPathPart(ProgramFilename())) 
+        
+        ; Получаем параметры командной строки для файла Vivaldi_Run.exe
+        Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
+        
+        ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
+        ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
+        CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
+        ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
+        FreeRegularExpression(3)
+        
+        ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
+        If ParametrRFCLP<>""
+            NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
+        EndIf
+                    
     EndIf
-    
-    ; Получаем параметры командной строки для файла Vivaldi_Run.exe
-    Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
-    
-    ; Проверяем наличие файла VIVALDI_COMMAND_LINE.txt
-    If FileSize("VIVALDI_COMMAND_LINE.txt")=-1 
-        CreateFile(0, "VIVALDI_COMMAND_LINE.txt")
+        
+    ; Проверяем наличие файла с именем из глобальной переменной NameFileCommandLineVivaldi
+    If FileSize(NameFileCommandLineVivaldi)=-1 
+        CreateFile(0, NameFileCommandLineVivaldi)
         CloseFile(#PB_All)
     Else
-        Command_Line = LoadFromFile("VIVALDI_COMMAND_LINE.txt")
+        Command_Line = LoadFromFile(NameFileCommandLineVivaldi)
     EndIf
     
-    ; Проверяем наличие файла vivaldi.exe и запускаем VIVALDI
+    ; Проверяем наличие файла vivaldi.exe
     If FileSize("vivaldi.exe")=-1 
         MessageRequester("Vivaldi_Run", "File vivaldi.exe not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         End
@@ -310,8 +347,14 @@ Procedure RunVIVALDI(Command_Line_P.s)
         If CountParamVivaldi_Run>0
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
             End
-        EndIf   
+        EndIf  
         
+        ; Удаляем параметр --RFCLP
+        CreateRegularExpression(3, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1") 
+        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --RFCLP
+        FreeRegularExpression(3)
+        
+        ; запускаем VIVALDI
         If Command_Line_P=""
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
         Else
@@ -322,10 +365,10 @@ Procedure RunVIVALDI(Command_Line_P.s)
     If Command_Line_P=""
         ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
         CheckRun("Vivaldi_Run.exe")
-        
-        ; меняем приоритет своего процесса
-        ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
-    EndIf
+    EndIf   
+    ; меняем приоритет своего процесса
+    ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
+    
 EndProcedure
 
 ; Процедура поиска окон
@@ -591,7 +634,8 @@ RunVIVALDI("")
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 584
-; Folding = AAg
+; CursorPosition = 627
+; FirstLine = 55
+; Folding = AAA-
 ; EnableXP
 ; CompileSourceDirectory
