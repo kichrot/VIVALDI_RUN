@@ -3,7 +3,7 @@
 ; * https://forum.vivaldi.net/topic/43971/vivaldi_run-utility-windows-only
 ; * 2021 year 
 
-; ////////////////// Процедуры и функции ////////////////////////////
+; ////////////////// Глобальные переменные и константы ////////////////////////////
 
 ; глобальная переменная о состоянии автоскрытия панели задач. с которым был запущен VIVALDI
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
@@ -11,6 +11,8 @@ Global AutoHideTrayWnd=0
 
 ; глобальная переменная содержащая имя файла с параметрами командной строки VIVALDI
 Global NameFileCommandLineVivaldi.s="VIVALDI_COMMAND_LINE.txt"
+
+; ////////////////// Процедуры и функции ////////////////////////////
 
 ; Прототипы функций для работы с процессами 
 Prototype ProcessFirst(Snapshot, Process)
@@ -142,7 +144,7 @@ EndProcedure
 ; Процедура изменения приоритета процесса окна Vivaldi находящегося на переднем плане
 Procedure ChangeProcessPriorityVivaldi(Priority)
     Protected ThreadProcessId, HandleProcess
-    ThreadProcessId=GetWindowThreadProcessId_(GetForegroundWindow_(), 0)
+    GetWindowThreadProcessId_(GetForegroundWindow_(), @ThreadProcessId)
     SetThreadPriority_(ThreadProcessId , #THREAD_BASE_PRIORITY_MAX)
     HandleProcess=OpenProcess_(#PROCESS_DUP_HANDLE | #PROCESS_SET_INFORMATION, #True, ThreadProcessId)
     SetPriorityClass_(HandleProcess, Priority)
@@ -309,36 +311,33 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
 EndProcedure
 
 ; Процедура запуска VIVALDI
-Procedure RunVIVALDI(Command_Line_P.s)
+Procedure RunVIVALDI()
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run, ParametrRFCLP.s=""
     Protected Dim ParamVivaldi_Run.s(0)
     Protected Dim FileNameCommandLineVivaldi.s(0)
     
-    If Command_Line_P=""
-        ; заполняем глобальную переменную AutoHideTrayWnd
-        Set_AutoHideTrayWnd()
-        ; меняем приоритет своего процесса
-        ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
-        
-        ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
-        SetCurrentDirectory(GetPathPart(ProgramFilename())) 
-        
-        ; Получаем параметры командной строки для файла Vivaldi_Run.exe
-        Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
-        
-        ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
-        ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
-        CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
-        ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
-        FreeRegularExpression(3)
-        
-        ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
-        If ParametrRFCLP<>""
-            NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
-        EndIf
-                    
+    ; заполняем глобальную переменную AutoHideTrayWnd
+    Set_AutoHideTrayWnd()
+    ; меняем приоритет своего процесса
+    ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
+    
+    ; изменяем рабочий каталог на каталог расположения файла Vivaldi_Run.exe
+    SetCurrentDirectory(GetPathPart(ProgramFilename())) 
+    
+    ; Получаем параметры командной строки для файла Vivaldi_Run.exe
+    Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
+    
+    ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
+    ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
+    CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
+    ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
+    FreeRegularExpression(3)
+    
+    ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
+    If ParametrRFCLP<>""
+        NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
     EndIf
-        
+    
     ; Проверяем наличие файла с именем из глобальной переменной NameFileCommandLineVivaldi
     If FileSize(NameFileCommandLineVivaldi)=-1 
         CreateFile(0, NameFileCommandLineVivaldi)
@@ -352,7 +351,7 @@ Procedure RunVIVALDI(Command_Line_P.s)
         MessageRequester("Vivaldi_Run", "File vivaldi.exe not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         End
     Else
-        Command_Line=Command_Line_P+" "+Command_Line_Vivaldi_Run+" "+Command_Line
+        Command_Line=Command_Line_Vivaldi_Run+" "+Command_Line
         
         ; Проверяем наличие в параметрах коммандной строки параметра мини режима --only-start-with-VIVALDI_COMMAND_LINE.txt
         CreateRegularExpression(3, "--only-start-with-VIVALDI_COMMAND_LINE.txt")
@@ -370,17 +369,12 @@ Procedure RunVIVALDI(Command_Line_P.s)
         FreeRegularExpression(3)
         
         ; запускаем VIVALDI
-        If Command_Line_P=""
-            LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
-        Else
-            RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line,"", #PB_Program_Open)
-        EndIf    
+        RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line,"", #PB_Program_Open)
     EndIf
     
-    If Command_Line_P=""
-        ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
-        CheckRun("Vivaldi_Run.exe")
-    EndIf   
+    ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
+    CheckRun("Vivaldi_Run.exe")
+    
     ; меняем приоритет своего процесса
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
     
@@ -484,6 +478,99 @@ Procedure VivaldiClipboardAddress(Address.s)
     ClipboardText=""
 EndProcedure
 
+; Процедура получения коммандной строки процесса по PID
+Procedure.s GetCommandLines(PID)
+  Protected CL.s=""  
+  hr = 0
+  WbemLocator.IWbemLocator
+  WbemServices.IWbemServices
+  EnumWbem.IEnumWbemClassObject
+  
+  ; Шаг 1: ---------------------------------------------- ----
+  ; Инициализировать COM. ------------------------------------------
+  hr = CoInitializeEx_(0, #COINIT_MULTITHREADED);
+  
+  ; Шаг 2: ---------------------------------------------- ----
+  ; Установить общие уровни безопасности COM --------------------------
+  ; Примечание: если вы используете Windows 2000, вам необходимо указать -
+  ; учетные данные аутентификации по умолчанию для пользователя, использующего
+  ; Структура SOLE_AUTHENTICATION_LIST в pAuthList ----
+  ; параметр CoInitializeSecurity ------------------------
+  hr = CoInitializeSecurity_(#Null, -1, #Null, #Null, #RPC_C_AUTHN_LEVEL_DEFAULT, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE, #Null);
+  
+  ; Шаг 3: ---------------------------------------------- -----
+  ; Получить исходный локатор в WMI -------------------------
+  hr = CoCreateInstance_(?CLSID_WbemLocator, 0, #CLSCTX_INPROC_SERVER, ?IID_IWbemLocator, @WbemLocator);
+  
+  ; Шаг 4: ---------------------------------------------- -------
+  ; Подключиться к WMI через метод IWbemLocator :: ConnectServer
+  hr = WbemLocator\ConnectServer(@"ROOT\CIMV2", #Null, #Null, #Null, 0, #Null, #Null, @WbemServices);
+  
+  ; Шаг 5: ---------------------------------------------- ----
+  ; Установить уровни безопасности на прокси -------------------------
+  hr = CoSetProxyBlanket_(WbemServices, #RPC_C_AUTHN_WINNT, #RPC_C_AUTHZ_NONE, #Null, #RPC_C_AUTHN_LEVEL_CALL, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE);
+  
+  ; Шаг 6: ---------------------------------------------- ----
+  ; Используйте указатель IWbemServices, чтобы делать запросы к WMI ----
+  hr = WbemServices\ExecQuery(@"WQL", @"SELECT ProcessId,CommandLine FROM Win32_Process", #WBEM_FLAG_FORWARD_ONLY, #Null, @EnumWbem);
+  
+  ; Шаг 7: ---------------------------------------------- ---
+  ; Получить данные из запроса на шаге 6 -------------------
+  If EnumWbem <> #Null
+    result.IWbemClassObject = #Null;
+    returnedCount.l = 0            ;
+    
+    While EnumWbem\Next(#WBEM_INFINITE, 1, @result, @returnedCount) = #S_OK
+      ProcessId.VARIANT;
+      CommandLine.VARIANT;
+      
+      ;access the properties
+      hr = result\Get(@"ProcessId", 0, @ProcessId, 0, 0);
+      hr = result\Get(@"CommandLine", 0, @CommandLine, 0, 0);            
+      If (Not (CommandLine\vt=#VT_NULL))
+        If ProcessId\uintVal=PID
+            ; Debug ""+ ProcessId\uintVal+" "+PeekS(CommandLine\bstrVal)
+            CL=PeekS(CommandLine\bstrVal)
+            CreateRegularExpression(4, "^("+Chr(34)+")(.*?)("+Chr(34)+")")
+            CL = Trim(ReplaceRegularExpression(4, CL, ""))
+            FreeRegularExpression(4)
+            ProcedureReturn CL
+            Break
+          EndIf
+      EndIf
+      result\Release();
+     Wend
+  EndIf
+  
+  ; Очистка
+  ;========
+  EnumWbem\Release();
+  WbemServices\Release();
+  WbemLocator\Release();
+  
+  CoUninitialize_();
+  
+  DataSection
+    CLSID_WbemLocator:
+    ;4590f811-1d3a-11d0-891f-00aa004b2e24
+    Data.l $4590F811
+    Data.w $1D3A, $11D0
+    Data.b $89, $1F, $00, $AA, $00, $4B, $2E, $24
+    IID_IWbemLocator:
+    ;dc12a687-737f-11cf-884d-00aa004b2e24
+    Data.l $DC12A687
+    Data.w $737F, $11CF
+    Data.b $88, $4D, $00, $AA, $00, $4B, $2E, $24
+  EndDataSection
+EndProcedure
+
+Procedure OpenURLinVivaldiForegroundWindow(URL.s)
+    Protected ThreadProcessId=0, CommandLine.s=""
+    GetWindowThreadProcessId_(GetForegroundWindow_(), @ThreadProcessId)
+    CommandLine=GetCommandLines(ThreadProcessId)
+    RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
+EndProcedure    
+
 ; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
 Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; Проверяет существование активного окна с задаными классом и именем
@@ -524,7 +611,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                         SetForegroundWindow_(hWndDevTool)
                         SetActiveWindow_(hWndDevTool)
                     Else
-                        RunVIVALDI("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
+                        OpenURLinVivaldiForegroundWindow("chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html")
                         counter=0
                         Repeat 
                             If WndEnumEx("Chrome_WidgetWin_1", "Vivaldi - Vivaldi", "Y")=0
@@ -567,7 +654,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; Открытие страницы, по заданному адресу, в новой вкладке
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                     ExtractRegularExpression(2, name, PageAddress())
-                    RunVIVALDI(PageAddress(0))
+                    OpenURLinVivaldiForegroundWindow(PageAddress(0))
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=22
                     ; включение/выключение автоскрытия панели задач
@@ -644,13 +731,16 @@ EndProcedure
 ; ///////////////////////// Основной алгоритм //////////////////////////////////
 
 ; Запускаем VIVALDI
-RunVIVALDI("")
+RunVIVALDI()
 
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
+
+
+
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 642
-; FirstLine = 54
-; Folding = AAA-
+; CursorPosition = 729
+; FirstLine = 61
+; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
