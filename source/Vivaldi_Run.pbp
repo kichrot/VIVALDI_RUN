@@ -7,22 +7,22 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-19 22:23" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-01-20 13:08" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="3e3e5b85272d9abe70cc6ed4b7a74861"/>
+      <fingerprint md5="b7f1b66667cb4617764ff9b04240deb5"/>
     </file>
   </section>
   <section name="targets">
     <target name="Vivaldi_Run.pb" enabled="1" default="1">
       <inputfile value="Vivaldi_Run.pb"/>
       <outputfile value="Vivaldi_Run.exe"/>
-      <compiler version="PureBasic 5.70 LTS (Windows - x64)"/>
+      <compiler version="PureBasic 5.72 (Windows - x64)"/>
       <executable value="Vivaldi_Run.exe"/>
       <directory value="C:\Program Files\Vivaldi\Application\"/>
-      <options thread="1" debug="1"/>
+      <options thread="1"/>
       <purifier enable="1"/>
       <icon enable="1">VIvaldi_RUN.ico</icon>
       <format exe="default" cpu="1"/>

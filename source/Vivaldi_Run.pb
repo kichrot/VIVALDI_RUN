@@ -565,9 +565,18 @@ Procedure.s GetCommandLines(PID)
 EndProcedure
 
 Procedure OpenURLinVivaldiForegroundWindow(URL.s)
-    Protected ThreadProcessId=0, CommandLine.s=""
+    Protected ThreadProcessId=0, CommandLine.s="", PathProfileParam=0
+    Protected Dim ParamPathProfile.s(0)
     GetWindowThreadProcessId_(GetForegroundWindow_(), @ThreadProcessId)
     CommandLine=GetCommandLines(ThreadProcessId)
+    CreateRegularExpression(4, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
+    PathProfileParam=ExtractRegularExpression(4, CommandLine, ParamPathProfile())
+    If PathProfileParam>0
+        CommandLine=Trim(ParamPathProfile(0))
+    Else
+        CommandLine=""
+    EndIf
+    FreeRegularExpression(4)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
@@ -739,8 +748,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 729
-; FirstLine = 61
+; CursorPosition = 737
+; FirstLine = 63
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
