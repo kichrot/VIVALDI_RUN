@@ -480,88 +480,78 @@ EndProcedure
 
 ; Процедура получения коммандной строки процесса по PID
 Procedure.s GetCommandLines(PID)
-  Protected CL.s=""  
-  hr = 0
-  WbemLocator.IWbemLocator
-  WbemServices.IWbemServices
-  EnumWbem.IEnumWbemClassObject
-  
-  ; Шаг 1: ---------------------------------------------- ----
-  ; Инициализировать COM. ------------------------------------------
-  hr = CoInitializeEx_(0, #COINIT_MULTITHREADED);
-  
-  ; Шаг 2: ---------------------------------------------- ----
-  ; Установить общие уровни безопасности COM --------------------------
-  ; Примечание: если вы используете Windows 2000, вам необходимо указать -
-  ; учетные данные аутентификации по умолчанию для пользователя, использующего
-  ; Структура SOLE_AUTHENTICATION_LIST в pAuthList ----
-  ; параметр CoInitializeSecurity ------------------------
-  hr = CoInitializeSecurity_(#Null, -1, #Null, #Null, #RPC_C_AUTHN_LEVEL_DEFAULT, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE, #Null);
-  
-  ; Шаг 3: ---------------------------------------------- -----
-  ; Получить исходный локатор в WMI -------------------------
-  hr = CoCreateInstance_(?CLSID_WbemLocator, 0, #CLSCTX_INPROC_SERVER, ?IID_IWbemLocator, @WbemLocator);
-  
-  ; Шаг 4: ---------------------------------------------- -------
-  ; Подключиться к WMI через метод IWbemLocator :: ConnectServer
-  hr = WbemLocator\ConnectServer(@"ROOT\CIMV2", #Null, #Null, #Null, 0, #Null, #Null, @WbemServices);
-  
-  ; Шаг 5: ---------------------------------------------- ----
-  ; Установить уровни безопасности на прокси -------------------------
-  hr = CoSetProxyBlanket_(WbemServices, #RPC_C_AUTHN_WINNT, #RPC_C_AUTHZ_NONE, #Null, #RPC_C_AUTHN_LEVEL_CALL, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE);
-  
-  ; Шаг 6: ---------------------------------------------- ----
-  ; Используйте указатель IWbemServices, чтобы делать запросы к WMI ----
-  hr = WbemServices\ExecQuery(@"WQL", @"SELECT ProcessId,CommandLine FROM Win32_Process", #WBEM_FLAG_FORWARD_ONLY, #Null, @EnumWbem);
-  
-  ; Шаг 7: ---------------------------------------------- ---
-  ; Получить данные из запроса на шаге 6 -------------------
-  If EnumWbem <> #Null
-    result.IWbemClassObject = #Null;
-    returnedCount.l = 0            ;
+    Protected CL.s=""  
+    hr = 0
+    WbemLocator.IWbemLocator
+    WbemServices.IWbemServices
+    EnumWbem.IEnumWbemClassObject
     
-    While EnumWbem\Next(#WBEM_INFINITE, 1, @result, @returnedCount) = #S_OK
-      ProcessId.VARIANT;
-      CommandLine.VARIANT;
-      
-      ;access the properties
-      hr = result\Get(@"ProcessId", 0, @ProcessId, 0, 0);
-      hr = result\Get(@"CommandLine", 0, @CommandLine, 0, 0);            
-      If (Not (CommandLine\vt=#VT_NULL))
-        If ProcessId\uintVal=PID
-            ; Debug ""+ ProcessId\uintVal+" "+PeekS(CommandLine\bstrVal)
-            CL=PeekS(CommandLine\bstrVal)
-            CreateRegularExpression(4, "^("+Chr(34)+")(.*?)("+Chr(34)+")")
-            CL = Trim(ReplaceRegularExpression(4, CL, ""))
-            FreeRegularExpression(4)
-            ProcedureReturn CL
-            Break
-          EndIf
-      EndIf
-      result\Release();
-     Wend
-  EndIf
-  
-  ; Очистка
-  ;========
-  EnumWbem\Release();
-  WbemServices\Release();
-  WbemLocator\Release();
-  
-  CoUninitialize_();
-  
-  DataSection
-    CLSID_WbemLocator:
-    ;4590f811-1d3a-11d0-891f-00aa004b2e24
-    Data.l $4590F811
-    Data.w $1D3A, $11D0
-    Data.b $89, $1F, $00, $AA, $00, $4B, $2E, $24
-    IID_IWbemLocator:
-    ;dc12a687-737f-11cf-884d-00aa004b2e24
-    Data.l $DC12A687
-    Data.w $737F, $11CF
-    Data.b $88, $4D, $00, $AA, $00, $4B, $2E, $24
-  EndDataSection
+    ; Шаг 1: ---------------------------------------------- ----
+    ; Инициализировать COM. ------------------------------------------
+    hr = CoInitializeEx_(0, #COINIT_MULTITHREADED);
+    
+    ; Шаг 2: ---------------------------------------------- ----
+    ; Установить общие уровни безопасности COM --------------------------
+    ; Примечание: если вы используете Windows 2000, вам необходимо указать -
+    ; учетные данные аутентификации по умолчанию для пользователя, использующего
+    ; Структура SOLE_AUTHENTICATION_LIST в pAuthList ----
+    ; параметр CoInitializeSecurity ------------------------
+    hr = CoInitializeSecurity_(#Null, -1, #Null, #Null, #RPC_C_AUTHN_LEVEL_DEFAULT, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE, #Null);
+    
+    ; Шаг 3: ---------------------------------------------- -----
+    ; Получить исходный локатор в WMI -------------------------
+    hr = CoCreateInstance_(?CLSID_WbemLocator, 0, #CLSCTX_INPROC_SERVER, ?IID_IWbemLocator, @WbemLocator);
+    
+    ; Шаг 4: ---------------------------------------------- -------
+    ; Подключиться к WMI через метод IWbemLocator :: ConnectServer
+    hr = WbemLocator\ConnectServer(@"ROOT\CIMV2", #Null, #Null, #Null, 0, #Null, #Null, @WbemServices);
+    
+    ; Шаг 5: ---------------------------------------------- ----
+    ; Установить уровни безопасности на прокси -------------------------
+    hr = CoSetProxyBlanket_(WbemServices, #RPC_C_AUTHN_WINNT, #RPC_C_AUTHZ_NONE, #Null, #RPC_C_AUTHN_LEVEL_CALL, #RPC_C_IMP_LEVEL_IMPERSONATE, #Null, #EOAC_NONE);
+    
+    ; Шаг 6: ---------------------------------------------- ----
+    ; Используйте указатель IWbemServices, чтобы делать запросы к WMI ----
+    hr = WbemServices\ExecQuery(@"WQL", @"SELECT ProcessId,CommandLine FROM Win32_Process", #WBEM_FLAG_FORWARD_ONLY, #Null, @EnumWbem);
+    
+    ; Шаг 7: ---------------------------------------------- ---
+    ; Получить данные из запроса на шаге 6 -------------------
+    If EnumWbem <> #Null
+        result.IWbemClassObject = #Null;
+        returnedCount.l = 0            ;
+        
+        While EnumWbem\Next(#WBEM_INFINITE, 1, @result, @returnedCount) = #S_OK
+            ProcessId.VARIANT;
+            CommandLine.VARIANT;
+            
+            ;access the properties
+            hr = result\Get(@"ProcessId", 0, @ProcessId, 0, 0);
+            hr = result\Get(@"CommandLine", 0, @CommandLine, 0, 0);            
+            If (Not (CommandLine\vt=#VT_NULL))
+                If ProcessId\uintVal=PID
+                    ; Debug ""+ ProcessId\uintVal+" "+PeekS(CommandLine\bstrVal)
+                    CL=PeekS(CommandLine\bstrVal)
+                    CreateRegularExpression(4, "^("+Chr(34)+")(.*?)("+Chr(34)+")")
+                    CL = Trim(ReplaceRegularExpression(4, CL, ""))
+                    FreeRegularExpression(4)
+                    result\Release();
+                    Break
+                EndIf
+            EndIf
+            result\Release();
+        Wend
+    EndIf
+    
+    ; Очистка
+    ;========
+    EnumWbem\Release();
+    WbemServices\Release();
+    WbemLocator\Release() ;
+    
+    CoUninitialize_();
+    
+    ProcedureReturn CL
+    
 EndProcedure
 
 Procedure OpenURLinVivaldiForegroundWindow(URL.s)
@@ -745,11 +735,24 @@ RunVIVALDI()
 ; Нормальное функционирование
 VivaldiKodeKeyWait()
 
+; ///////////////////////// Секция данных    ///////////////////////////////////
 
+; данные для процедуры GetCommandLines(PID)
+DataSection
+    CLSID_WbemLocator:
+    ;4590f811-1d3a-11d0-891f-00aa004b2e24
+    Data.l $4590F811
+    Data.w $1D3A, $11D0
+    Data.b $89, $1F, $00, $AA, $00, $4B, $2E, $24
+    IID_IWbemLocator:
+    ;dc12a687-737f-11cf-884d-00aa004b2e24
+    Data.l $DC12A687
+    Data.w $737F, $11CF
+    Data.b $88, $4D, $00, $AA, $00, $4B, $2E, $24
+EndDataSection
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 737
-; FirstLine = 63
+; CursorPosition = 731
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
