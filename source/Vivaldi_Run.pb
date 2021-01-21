@@ -12,6 +12,12 @@ Global AutoHideTrayWnd=0
 ; глобальная переменная содержащая имя файла с параметрами командной строки VIVALDI
 Global NameFileCommandLineVivaldi.s="VIVALDI_COMMAND_LINE.txt"
 
+; глобальная переменная содержащая PID процесса текщего активного окна VIVALDI
+Global PidActiveWndVivaldi=0
+
+; глобальная переменная содержащая параметр ком. строки к профилю VIVALDI для активного окна
+Global ParamProfileActiveWndVivaldi.s=""
+
 ; ////////////////// Процедуры и функции ////////////////////////////
 
 ; Прототипы функций для работы с процессами 
@@ -554,19 +560,26 @@ Procedure.s GetCommandLines(PID)
     
 EndProcedure
 
+; Процедура открытия URL  в новой вкладке текщего активного окна VIVALDI
 Procedure OpenURLinVivaldiForegroundWindow(URL.s)
-    Protected ThreadProcessId=0, CommandLine.s="", PathProfileParam=0
+    Protected ProcessId=0, CommandLine.s="", PathProfileParam=0
     Protected Dim ParamPathProfile.s(0)
-    GetWindowThreadProcessId_(GetForegroundWindow_(), @ThreadProcessId)
-    CommandLine=GetCommandLines(ThreadProcessId)
-    CreateRegularExpression(4, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
-    PathProfileParam=ExtractRegularExpression(4, CommandLine, ParamPathProfile())
-    If PathProfileParam>0
-        CommandLine=Trim(ParamPathProfile(0))
+    GetWindowThreadProcessId_(GetForegroundWindow_(), @ProcessId)
+    If ProcessId=PidActiveWndVivaldi
+        CommandLine=ParamProfileActiveWndVivaldi
     Else
-        CommandLine=""
+        CommandLine=GetCommandLines(ProcessId)
+        CreateRegularExpression(4, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
+        PathProfileParam=ExtractRegularExpression(4, CommandLine, ParamPathProfile())
+        If PathProfileParam>0
+            CommandLine=Trim(ParamPathProfile(0))
+        Else
+            CommandLine=""
+        EndIf
+        FreeRegularExpression(4)
+        PidActiveWndVivaldi=ProcessId
+        ParamProfileActiveWndVivaldi=CommandLine
     EndIf
-    FreeRegularExpression(4)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
@@ -752,7 +765,8 @@ DataSection
 EndDataSection
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 731
+; CursorPosition = 741
+; FirstLine = 77
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
