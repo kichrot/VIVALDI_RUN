@@ -486,8 +486,7 @@ EndProcedure
 
 ; Процедура получения коммандной строки процесса по PID
 Procedure.s GetCommandLines(PID)
-    Protected CL.s=""  
-    hr = 0
+    Protected CL.s="", hr=0 
     WbemLocator.IWbemLocator
     WbemServices.IWbemServices
     EnumWbem.IEnumWbemClassObject
@@ -537,6 +536,7 @@ Procedure.s GetCommandLines(PID)
                 If ProcessId\uintVal=PID
                     ; Debug ""+ ProcessId\uintVal+" "+PeekS(CommandLine\bstrVal)
                     CL=PeekS(CommandLine\bstrVal)
+                    SysFreeString_(CommandLine\bstrVal)
                     CreateRegularExpression(4, "^("+Chr(34)+")(.*?)("+Chr(34)+")")
                     CL = Trim(ReplaceRegularExpression(4, CL, ""))
                     FreeRegularExpression(4)
@@ -766,7 +766,7 @@ EndDataSection
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
 ; CursorPosition = 741
-; FirstLine = 77
+; FirstLine = 72
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
