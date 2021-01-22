@@ -7,16 +7,16 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-21 22:06" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-01-22 13:04" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="NQIP.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate=""/>
-      <fingerprint md5="354fec5f5620cda7590fffba046afefc"/>
+      <fingerprint md5="e5f540f80a10d966c1ab9f71d23e67bc"/>
     </file>
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="48ca11541d6470c822f2ddca4071251f"/>
+      <fingerprint md5="e95ae04ae4146f30d5eb122bb7345650"/>
     </file>
   </section>
   <section name="targets">
@@ -26,9 +26,10 @@
       <compiler version="PureBasic 5.72 (Windows - x64)"/>
       <executable value="Vivaldi_Run.exe"/>
       <directory value="C:\Program Files\Vivaldi\Application\"/>
-      <options/>
+      <options thread="1"/>
       <purifier enable="1"/>
       <icon enable="1">VIvaldi_RUN.ico</icon>
+      <format exe="default" cpu="1"/>
       <debugger custom="1" type="ide"/>
       <warnings custom="1" type="display"/>
       <versioninfo enable="1">

@@ -223,9 +223,9 @@ Procedure.s NQIP_GetCommandLine(PID)
 EndProcedure
 ; Debug NQIP_GetCommandLine(22296)
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 46
-; FirstLine = 100
-; Folding = --
+; CursorPosition = 100
+; FirstLine = 95
+; Folding = A-
 ; EnableXP
 ; CompileSourceDirectory
 ; Compiler = PureBasic 5.72 (Windows - x64)
