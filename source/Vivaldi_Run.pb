@@ -345,6 +345,9 @@ Procedure RunVIVALDI()
     If OSbits()=32 And #PB_Compiler_Processor=#PB_Processor_x64
         MessageRequester("Vivaldi_Run", "For your OS, use the 32-bit version of Vivaldi_Run.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL) 
         End
+    ElseIf OSbits()=64 And #PB_Compiler_Processor=#PB_Processor_x86
+        MessageRequester("Vivaldi_Run", "For your OS, use the 64-bit version of Vivaldi_Run.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL) 
+        End
     EndIf
     
     ; заполняем глобальную переменную AutoHideTrayWnd
@@ -702,8 +705,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 346
-; FirstLine = 71
-; Folding = BAA9
+; CursorPosition = 694
+; FirstLine = 79
+; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
