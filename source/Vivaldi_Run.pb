@@ -12,6 +12,10 @@ XIncludeFile "NQIP.pbi"
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
 Global AutoHideTrayWnd=0
 
+; глобальная переменная о назначенном текущем состоянии автоскрытия панели задач
+; 0 - автоскрытие без изменений, 1 - автоскрытие переключено (по отношению к начальному состоянию)
+Global TrigerAutoHide=0
+
 ; глобальная переменная содержащая имя файла с параметрами командной строки VIVALDI
 Global NameFileCommandLineVivaldi.s="VIVALDI_COMMAND_LINE.txt"
 
@@ -176,13 +180,13 @@ Procedure ChangeProcessPriorityVivaldi(Priority)
     CloseHandle_(HandleProcess)
 EndProcedure
 
-; Процедура определения значения глобальной переменной AutoHideTrayWnd
+; Процедура определения значения глобальнjq переменнjq AutoHideTrayWnd
 ;(состоянии автоскрытия панели задач, с которым был запущен VIVALDI)
 Procedure Set_AutoHideTrayWnd()
     #ABM_SETSTATE = 10
     aBdata.AppBarData
     aBdata\cbsize = SizeOf(AppBarData)
-    ; проверка существования семафорjd, что режим автоскрытия панели задач в WINDOWS выключен/включен
+    ; проверка существования семафоров, что режим автоскрытия панели задач в WINDOWS выключен/включен
     *a = CreateSemaphore_(0, 0, 1, "AutoHideTrayWnd")
     *b = CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
     If *b <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
@@ -195,16 +199,17 @@ Procedure Set_AutoHideTrayWnd()
             ; создание семафора, что режим автоскрытия панели задач в WINDOWS включен
             CreateSemaphore_(0, 0, 1, "AutoHideTrayWnd")
         Else
-            AutoHideTrayWnd=0 
+            AutoHideTrayWnd=0
             ; создание семафора, что режим автоскрытия панели задач в WINDOWS выключен
             CreateSemaphore_(0, 0, 1, "NoAutoHideTrayWnd")
         EndIf
     EndIf
     CloseHandle_(*a)
     CloseHandle_(*b)
+    TrigerAutoHide=0
 EndProcedure
 
-; Процедура перевода панели задач в режим автоскрытия 
+; Процедура изменения режима автоскрытия панели задач 
 Procedure TrayWndAutoHide(AutoHide=1)
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
     #ABM_SETSTATE = 10
@@ -214,12 +219,22 @@ Procedure TrayWndAutoHide(AutoHide=1)
         If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
             aBdata\lparam = #ABS_ALWAYSONTOP
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
+            If AutoHideTrayWnd=0
+                TrigerAutoHide=0
+            Else
+                TrigerAutoHide=1
+            EndIf   
         Else
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
             ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_HIDE)
             Delay(30)
             ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_SHOW)
+            If AutoHideTrayWnd=0
+                TrigerAutoHide=1
+            Else
+                TrigerAutoHide=0
+            EndIf  
         EndIf
     Else
         If AutoHideTrayWnd=0
@@ -228,7 +243,8 @@ Procedure TrayWndAutoHide(AutoHide=1)
         Else
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata) 
-        EndIf  
+        EndIf
+        TrigerAutoHide=0
     EndIf
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
@@ -665,6 +681,7 @@ EndProcedure
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
     Protected counter, count, hWnd=0
+    hWnd=VivaldiWndEnumWait()
     Repeat 
         counter=0
         Repeat
@@ -679,11 +696,13 @@ Procedure VivaldiKodeKeyWait()
                     Delay(30)
                 EndIf
             Until count=20
-            ; Возвращаем панель задач в исходное состояние при отсутствии окна VIVALDI
+            ; Возвращаем панель задач в исходное состояние при изменении состояния окна VIVALDI
             Sleep_(0)
-            If IsWindow_(hWnd)=0
+            If IsWindow_(hWnd)=0 
                 TrayWndAutoHide(0)
                 Break
+            ElseIf TrigerAutoHide=1 And (IsIconic_(hWnd)<>0 Or IsZoomed_(hWnd)=0 Or GetForegroundWindow_()<>hWnd)
+                TrayWndAutoHide(0)
             EndIf
             Sleep_(30)
         ForEver
@@ -705,8 +724,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 694
-; FirstLine = 79
+; CursorPosition = 707
+; FirstLine = 83
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
