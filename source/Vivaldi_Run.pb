@@ -680,9 +680,8 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counter, count, hWnd=0, hWnd_F=0
+    Protected counter, count, hWnd=0, hWnd_New=0
     hWnd=VivaldiWndEnumWait()
-    class.s= Space(256)
     Repeat 
         counter=0
         Repeat
@@ -699,21 +698,21 @@ Procedure VivaldiKodeKeyWait()
             Until count=20
             ; Возвращаем панель задач в исходное состояние при изменении состояния окна VIVALDI
             Sleep_(0)
-            hWnd_F=GetForegroundWindow_()
-            If hWnd_F<>hWnd
-                class.s= Space(256)
-                GetClassName_(hWnd_F, @class, 256)
-                If class= "Chrome_WidgetWin_1"
-                    hWnd=hWnd_F
-                    TrayWndAutoHide(0)
-                EndIf    
-            EndIf
-            Sleep_(0)
             If IsWindow_(hWnd)=0 
                 TrayWndAutoHide(0)
                 Break
-            ElseIf TrigerAutoHide=1 And (IsIconic_(hWnd)<>0 Or IsZoomed_(hWnd)=0 Or GetForegroundWindow_()<>hWnd)
+            EndIf  
+            Sleep_(0)
+            If TrigerAutoHide=1 And (IsZoomed_(hWnd)=0 Or GetForegroundWindow_()<>hWnd)    
                 TrayWndAutoHide(0)
+            EndIf
+            Sleep_(0)
+            If GetForegroundWindow_()<>hWnd
+                hWnd_New=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "Y")
+                If hWnd_New<>0
+                    hWnd=hWnd_New
+                    hWnd_New=0
+                EndIf
             EndIf
             Sleep_(30)
         ForEver
@@ -735,8 +734,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 724
-; FirstLine = 74
+; CursorPosition = 722
+; FirstLine = 83
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
