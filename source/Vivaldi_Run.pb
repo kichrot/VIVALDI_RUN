@@ -212,8 +212,10 @@ EndProcedure
 ; Процедура изменения режима автоскрытия панели задач 
 Procedure TrayWndAutoHide(AutoHide=1)
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
+    TaskBar=FindWindow_("Shell_TrayWnd", 0)
     #ABM_SETSTATE = 10
     aBdata.AppBarData
+    aBdata\hwnd = TaskBar
     aBdata\cbsize = SizeOf(AppBarData)
     If AutoHide=1
         If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
@@ -225,11 +227,11 @@ Procedure TrayWndAutoHide(AutoHide=1)
                 TrigerAutoHide=1
             EndIf   
         Else
-            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_HIDE)
+            ShowWindow_(TaskBar, SW_HIDE)
             Delay(400)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
-            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_SHOW)
+            ShowWindow_(TaskBar, SW_SHOW)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=1
             Else
@@ -734,8 +736,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 723
-; FirstLine = 83
+; CursorPosition = 725
+; FirstLine = 82
 ; Folding = AAA9
 ; EnableXP
 ; CompileSourceDirectory
