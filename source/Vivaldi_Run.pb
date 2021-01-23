@@ -225,10 +225,10 @@ Procedure TrayWndAutoHide(AutoHide=1)
                 TrigerAutoHide=1
             EndIf   
         Else
+            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_HIDE)
+            Delay(400)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
-            ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_HIDE)
-            Delay(30)
             ShowWindow_(FindWindow_("Shell_TrayWnd", 0), SW_SHOW)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=1
@@ -696,7 +696,7 @@ Procedure VivaldiKodeKeyWait()
                     Delay(30)
                 EndIf
             Until count=20
-            ; Возвращаем панель задач в исходное состояние при изменении состояния окна VIVALDI
+            ; Возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
             Sleep_(0)
             If IsWindow_(hWnd)=0 
                 TrayWndAutoHide(0)
@@ -734,7 +734,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 722
+; CursorPosition = 723
 ; FirstLine = 83
 ; Folding = AAA9
 ; EnableXP
