@@ -353,7 +353,8 @@ Procedure TrayWndAutoHide(AutoHide=1)
     If hWndVivaldiForegroundWindowAndZoomed(0)<>0
         count=0
         Repeat 
-            ; ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_MAXIMIZE)
+            ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_SHOWNOACTIVATE)
+            BringWindowToTop_(hWnd)
             count=count+1
         Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
         ReDim hWndVivaldiForegroundWindowAndZoomed(0)
@@ -784,8 +785,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 777
-; FirstLine = 92
+; CursorPosition = 774
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
