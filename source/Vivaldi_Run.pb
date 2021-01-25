@@ -634,6 +634,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; Открыть DevTools для интерфейса VIVALDI 
                     Protected counter=0
                     hWndDevTool=0
+                    If TrigerAutoHide=1
+                        TrayWndAutoHide(0)
+                    EndIf    
                     If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
                         hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
                         SetForegroundWindow_(hWndDevTool)
@@ -662,6 +665,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     VivaldiClipboardAddress("vivaldi://startpage")
                 ElseIf Val(VirtKeyCode(0))=11
                     ; Реализация кнопки запуска программ WINDOWS
+                    If TrigerAutoHide=1
+                        TrayWndAutoHide(0)
+                    EndIf    
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                     CountCommandLineParameters=ExtractRegularExpression(2, name, CommandLineParameters())
                     If CountCommandLineParameters=1
@@ -686,10 +692,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=22
                     ; включение/выключение автоскрытия панели задач
-                    
-                    
-                    
-                    
                     TrayWndAutoHide(1)
                 Else
                     ; стандартные кнопки
@@ -785,7 +787,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 774
+; CursorPosition = 776
+; FirstLine = 86
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
