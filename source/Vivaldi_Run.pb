@@ -25,6 +25,9 @@ Global PidActiveWndVivaldi=0
 ; глобальная переменная содержащая параметр ком. строки к профилю VIVALDI для активного окна
 Global ParamProfileActiveWndVivaldi.s=""
 
+; глобальный массив для хранения hWnd развернутых окон VIVALDI принадлежащих к процессу активного окна VIVALDI 
+Global Dim hWndVivaldiForegroundWindowAndZoomed(0)
+
 ; объявление внешней переменной из WINAPI для процедуры OSbits()
 Import ""
     GetNativeSystemInfo(*info)
@@ -180,7 +183,95 @@ Procedure ChangeProcessPriorityVivaldi(Priority)
     CloseHandle_(HandleProcess)
 EndProcedure
 
-; Процедура определения значения глобальнjq переменнjq AutoHideTrayWnd
+; Процедура поиска окон
+Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s) 
+    ; Проверяет существование окон по классу и имени окна в фрмате рег. выражений
+    ; Параметры:
+    ; Class - класс окна
+    ; TextTitleRegExp - имя окна в формате регулярного выражения
+    ; WndForeground - указание на обработку активного окна переднего плана, "Y" - обрабатывать,"N" - не обрабатывать
+    ; Возвращает:
+    ; 1) при WndForeground="Y", при соблюдении условий Class и TextTitleRegExp - хендл активного окна, при не соблюдении условий возвращает - 0
+    ; 2) при WndForeground="N", при соблюдении условий Class и TextTitleRegExp - хендл окна, при не соблюдении условий возвращает - 0
+    ; Пример использования: Debug WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
+    
+    Protected Flag,hWnd,return_proc
+    CreateRegularExpression(0, TextTitleRegExp)
+    Sleep_(0)
+    If  WndForeground="Y"
+        hWnd = GetForegroundWindow_()
+        clas.s= Space(256) 
+        GetClassName_(hWnd, @clas, 256)
+        If clas=Class
+            name.s = Space(256)
+            GetWindowText_(hWnd, @name, 256)
+            If MatchRegularExpression(0, name)
+                return_proc=hWnd
+            EndIf
+        EndIf
+    Else
+        Repeat
+            Sleep_(0)
+            If Flag=0
+                hWnd = FindWindow_( 0, 0 )
+                Flag=1
+            Else    
+                hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
+            EndIf
+            If hWnd <> 0
+                clas.s= Space(256) 
+                GetClassName_(hWnd, @clas, 256)
+                If IsWindowVisible_(hWnd)  
+                    If clas=Class
+                        name.s = Space(256)
+                        GetWindowText_(hWnd, @name, 256)
+                        If MatchRegularExpression(0, name)
+                            return_proc=hWnd
+                        EndIf
+                    EndIf
+                EndIf
+            Else
+                Flag=0 
+            EndIf
+        Until hWnd=0
+        FreeRegularExpression(0)
+        If return_proc>0
+            ProcedureReturn return_proc  
+        Else
+            ProcedureReturn 0  
+        EndIf
+    EndIf
+    Sleep_(0)
+    FreeRegularExpression(0)
+    If return_proc>0
+        ProcedureReturn return_proc  
+    Else
+        ProcedureReturn 0  
+    EndIf
+EndProcedure
+
+; Процедура повторного вызова для EnumWindows_ в процедуре CheckingForTwoVivaldiWindowsInOneProcess(hWnd)
+Procedure.l EnumProcedure(hWnd, PID)
+    ; ищем  hWnd развернутых окон VIVALDI принадлежащих к процессу активного окна VIVALDI
+    ; и помещаем их в глобальный массив hWndVivaldiForegroundWindowAndZoomed()
+    Protected ProcessId=0 
+    GetWindowThreadProcessId_(hWnd, @ProcessId) 
+    hWndVivaldiForegroundWindow=GetForegroundWindow_()
+    If ProcessId=PID And hWnd<>hWndVivaldiForegroundWindow  And IsZoomed_(hWnd)<>0
+        ReDim hWndVivaldiForegroundWindowAndZoomed(ArraySize(hWndVivaldiForegroundWindowAndZoomed())+1)
+        hWndVivaldiForegroundWindowAndZoomed(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)=hWnd
+    EndIf 
+    ProcedureReturn 1  
+EndProcedure 
+
+; Процедура проверки на другие окна VIVALDI в одном процессе с активным окном (т.е. запущеных с одним пользовательским профилем)
+Procedure CheckingForOthersVivaldiWindowsInOneProcess()
+    Protected ProcessId=0
+    GetWindowThreadProcessId_(GetForegroundWindow_(), @ProcessId)  
+    EnumWindows_(@EnumProcedure(), ProcessId)
+EndProcedure 
+
+; Процедура определения значения глобальной переменной AutoHideTrayWnd
 ;(состоянии автоскрытия панели задач, с которым был запущен VIVALDI)
 Procedure Set_AutoHideTrayWnd()
     #ABM_SETSTATE = 10
@@ -211,7 +302,18 @@ EndProcedure
 
 ; Процедура изменения режима автоскрытия панели задач 
 Procedure TrayWndAutoHide(AutoHide=1)
+    Protected TaskBar=0, count=0, hWnd=0
+    hWnd=GetForegroundWindow_()
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
+    ReDim hWndVivaldiForegroundWindowAndZoomed(0)
+    hWndVivaldiForegroundWindowAndZoomed(0)=0
+    CheckingForOthersVivaldiWindowsInOneProcess()
+    If hWndVivaldiForegroundWindowAndZoomed(0)<>0
+        Repeat            
+            ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_SHOWMINNOACTIVE)
+            count=count+1
+        Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
+    EndIf 
     TaskBar=FindWindow_("Shell_TrayWnd", 0)
     #ABM_SETSTATE = 10
     aBdata.AppBarData
@@ -248,6 +350,16 @@ Procedure TrayWndAutoHide(AutoHide=1)
         EndIf
         TrigerAutoHide=0
     EndIf
+    If hWndVivaldiForegroundWindowAndZoomed(0)<>0
+        count=0
+        Repeat 
+            ; ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_MAXIMIZE)
+            count=count+1
+        Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
+        ReDim hWndVivaldiForegroundWindowAndZoomed(0)
+        hWndVivaldiForegroundWindowAndZoomed(0)=0
+        count=0
+    EndIf 
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
 
@@ -432,73 +544,6 @@ Procedure RunVIVALDI()
     
 EndProcedure
 
-; Процедура поиска окон
-Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s) 
-    ; Проверяет существование окон по классу и имени окна в фрмате рег. выражений
-    ; Параметры:
-    ; Class - класс окна
-    ; TextTitleRegExp - имя окна в формате регулярного выражения
-    ; WndForeground - указание на обработку активного окна переднего плана, "Y" - обрабатывать,"N" - не обрабатывать
-    ; Возвращает:
-    ; 1) при WndForeground="Y", при соблюдении условий Class и TextTitleRegExp - хендл активного окна, при не соблюдении условий возвращает - 0
-    ; 2) при WndForeground="N", при соблюдении условий Class и TextTitleRegExp - хендл окна, при не соблюдении условий возвращает - 0
-    ; Пример использования: Debug WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
-    
-    Protected Flag,hWnd,return_proc
-    CreateRegularExpression(0, TextTitleRegExp)
-    Sleep_(0)
-    If  WndForeground="Y"
-        hWnd = GetForegroundWindow_()
-        clas.s= Space(256) 
-        GetClassName_(hWnd, @clas, 256)
-        If clas=Class
-            name.s = Space(256)
-            GetWindowText_(hWnd, @name, 256)
-            If MatchRegularExpression(0, name)
-                return_proc=hWnd
-            EndIf
-        EndIf
-    Else
-        Repeat
-            Sleep_(0)
-            If Flag=0
-                hWnd = FindWindow_( 0, 0 )
-                Flag=1
-            Else    
-                hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-            EndIf
-            If hWnd <> 0
-                clas.s= Space(256) 
-                GetClassName_(hWnd, @clas, 256)
-                If IsWindowVisible_(hWnd)  
-                    If clas=Class
-                        name.s = Space(256)
-                        GetWindowText_(hWnd, @name, 256)
-                        If MatchRegularExpression(0, name)
-                            return_proc=hWnd
-                        EndIf
-                    EndIf
-                EndIf
-            Else
-                Flag=0 
-            EndIf
-        Until hWnd=0
-        FreeRegularExpression(0)
-        If return_proc>0
-            ProcedureReturn return_proc  
-        Else
-            ProcedureReturn 0  
-        EndIf
-    EndIf
-    Sleep_(0)
-    FreeRegularExpression(0)
-    If return_proc>0
-        ProcedureReturn return_proc  
-    Else
-        ProcedureReturn 0  
-    EndIf
-EndProcedure
-
 ; Процедура проверки наличия и ожидания окон VIVALDI
 Procedure VivaldiWndEnumWait()
     Protected counter=0, hWnd=0
@@ -538,7 +583,6 @@ Procedure OpenURLinVivaldiForegroundWindow(URL.s)
     If ProcessId=PidActiveWndVivaldi
         CommandLine=ParamProfileActiveWndVivaldi
     Else
-        ;CommandLine=GetCommandLines(ProcessId)
         CommandLine=NQIP_GetCommandLine(ProcessId)
         CreateRegularExpression(4, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
         PathProfileParam=ExtractRegularExpression(4, CommandLine, ParamPathProfile())
@@ -641,6 +685,10 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=22
                     ; включение/выключение автоскрытия панели задач
+                    
+                    
+                    
+                    
                     TrayWndAutoHide(1)
                 Else
                     ; стандартные кнопки
@@ -736,8 +784,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 725
-; FirstLine = 82
-; Folding = AAA9
+; CursorPosition = 777
+; FirstLine = 92
+; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
