@@ -179,7 +179,7 @@ EndProcedure
 ; Процедура изменения приоритета процесса окна Vivaldi находящегося на переднем плане
 Procedure ChangeProcessPriorityVivaldi(Priority)
     Protected ThreadProcessId, HandleProcess
-    GetWindowThreadProcessId_(GetForegroundWindow_(), @ThreadProcessId)
+    GetWindowThreadProcessId_(hWndActiveWndVivaldi, @ThreadProcessId)
     SetThreadPriority_(ThreadProcessId , #THREAD_BASE_PRIORITY_MAX)
     HandleProcess=OpenProcess_(#PROCESS_DUP_HANDLE | #PROCESS_SET_INFORMATION, #True, ThreadProcessId)
     SetPriorityClass_(HandleProcess, Priority)
@@ -791,7 +791,7 @@ VivaldiKodeKeyWait()
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
 ; CursorPosition = 779
-; FirstLine = 95
+; FirstLine = 65
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
