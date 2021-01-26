@@ -22,6 +22,9 @@ Global NameFileCommandLineVivaldi.s="VIVALDI_COMMAND_LINE.txt"
 ; глобальная переменная содержащая PID процесса текщего активного окна VIVALDI
 Global PidActiveWndVivaldi=0
 
+; глобальная переменная содержащая hWnd текщего активного окна VIVALDI
+Global hWndActiveWndVivaldi=0
+
 ; глобальная переменная содержащая параметр ком. строки к профилю VIVALDI для активного окна
 Global ParamProfileActiveWndVivaldi.s=""
 
@@ -256,8 +259,7 @@ Procedure.l EnumProcedure(hWnd, PID)
     ; и помещаем их в глобальный массив hWndVivaldiForegroundWindowAndZoomed()
     Protected ProcessId=0 
     GetWindowThreadProcessId_(hWnd, @ProcessId) 
-    hWndVivaldiForegroundWindow=GetForegroundWindow_()
-    If ProcessId=PID And hWnd<>hWndVivaldiForegroundWindow  And IsZoomed_(hWnd)<>0
+    If ProcessId=PID And hWnd<>hWndActiveWndVivaldi  And IsZoomed_(hWnd)<>0
         ReDim hWndVivaldiForegroundWindowAndZoomed(ArraySize(hWndVivaldiForegroundWindowAndZoomed())+1)
         hWndVivaldiForegroundWindowAndZoomed(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)=hWnd
     EndIf 
@@ -267,7 +269,7 @@ EndProcedure
 ; Процедура проверки на другие окна VIVALDI в одном процессе с активным окном (т.е. запущеных с одним пользовательским профилем)
 Procedure CheckingForOthersVivaldiWindowsInOneProcess()
     Protected ProcessId=0
-    GetWindowThreadProcessId_(GetForegroundWindow_(), @ProcessId)  
+    GetWindowThreadProcessId_(hWndActiveWndVivaldi, @ProcessId)  
     EnumWindows_(@EnumProcedure(), ProcessId)
 EndProcedure 
 
@@ -303,7 +305,7 @@ EndProcedure
 ; Процедура изменения режима автоскрытия панели задач 
 Procedure TrayWndAutoHide(AutoHide=1)
     Protected TaskBar=0, count=0, hWnd=0
-    hWnd=GetForegroundWindow_()
+    hWnd=hWndActiveWndVivaldi
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
     ReDim hWndVivaldiForegroundWindowAndZoomed(0)
     hWndVivaldiForegroundWindowAndZoomed(0)=0
@@ -767,6 +769,7 @@ Procedure VivaldiKodeKeyWait()
                     hWnd_New=0
                 EndIf
             EndIf
+            hWndActiveWndVivaldi=hWnd
             Sleep_(30)
         ForEver
         ; ищем/ожидаем окно VIVALDI
@@ -787,8 +790,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 776
-; FirstLine = 86
+; CursorPosition = 779
+; FirstLine = 95
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
