@@ -357,6 +357,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
         Repeat 
             ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_SHOWNOACTIVATE)
             BringWindowToTop_(hWnd)
+            BringWindowToTop_(hWnd)
             count=count+1
         Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
         ReDim hWndVivaldiForegroundWindowAndZoomed(0)
@@ -636,9 +637,9 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; Открыть DevTools для интерфейса VIVALDI 
                     Protected counter=0
                     hWndDevTool=0
-                    If TrigerAutoHide=1
-                        TrayWndAutoHide(0)
-                    EndIf    
+;                     If TrigerAutoHide=1
+;                         TrayWndAutoHide(0)
+;                     EndIf    
                     If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
                         hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
                         SetForegroundWindow_(hWndDevTool)
@@ -751,17 +752,20 @@ Procedure VivaldiKodeKeyWait()
                     Delay(30)
                 EndIf
             Until count=20
-            ; Возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
             Sleep_(0)
+            ; возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
             If IsWindow_(hWnd)=0 
                 TrayWndAutoHide(0)
                 Break
-            EndIf  
-            Sleep_(0)
-            If TrigerAutoHide=1 And (IsZoomed_(hWnd)=0 Or GetForegroundWindow_()<>hWnd)    
-                TrayWndAutoHide(0)
+            ElseIf TrigerAutoHide=1
+                If IsIconic_(hWnd)<>0
+                    TrayWndAutoHide(0)
+                ElseIf GetForegroundWindow_()<>hWnd And WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0
+                    TrayWndAutoHide(0)
+                EndIf
             EndIf
             Sleep_(0)
+            ; проверяем окно VIVALDI переднем плане
             If GetForegroundWindow_()<>hWnd
                 hWnd_New=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "Y")
                 If hWnd_New<>0
@@ -790,8 +794,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 779
-; FirstLine = 65
+; CursorPosition = 783
+; FirstLine = 95
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
