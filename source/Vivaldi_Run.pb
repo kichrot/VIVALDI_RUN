@@ -332,7 +332,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
             EndIf   
         Else
             ShowWindow_(TaskBar, SW_HIDE)
-            Delay(400)
+            Delay(200)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
             ShowWindow_(TaskBar, SW_SHOW)
@@ -356,14 +356,16 @@ Procedure TrayWndAutoHide(AutoHide=1)
         count=0
         Repeat 
             ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_SHOWNOACTIVATE)
-            BringWindowToTop_(hWnd)
-            BringWindowToTop_(hWnd)
+            SetWindowPos_(hWndVivaldiForegroundWindowAndZoomed(count), hWnd, 0, 0, 0, 0, #SWP_NOACTIVATE)
+            SetWindowPos_(hWnd, HWND_TOP, 0, 0, 0, 0, #SWP_NOMOVE | #SWP_NOSIZE)
+            BringWindowToTop_(hWnd) 
+            SetFocus_(hWnd)
             count=count+1
         Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
         ReDim hWndVivaldiForegroundWindowAndZoomed(0)
         hWndVivaldiForegroundWindowAndZoomed(0)=0
         count=0
-    EndIf 
+    EndIf
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
 
@@ -736,8 +738,9 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counter, count, hWnd=0, hWnd_New=0, ProcessId_hWnd=0, ProcessId_hWnd_New=0
+    Protected counter, count, hWnd=0, hWnd_New=0, hWndTaskBar=0, ProcessId_hWnd=0, ProcessId_hWnd_New=0
     hWnd=VivaldiWndEnumWait()
+    hWndTaskBar=FindWindow_("Shell_TrayWnd", 0)
     Repeat 
         counter=0
         Repeat
@@ -760,7 +763,7 @@ Procedure VivaldiKodeKeyWait()
             ElseIf TrigerAutoHide=1
                 If IsZoomed_(hWnd)=0
                     TrayWndAutoHide(0)
-                ElseIf GetForegroundWindow_()<>hWnd And WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0
+                ElseIf GetForegroundWindow_()<>hWnd And GetForegroundWindow_()<>hWndTaskBar And WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0
                     TrayWndAutoHide(0)   
                 EndIf
             EndIf
@@ -805,7 +808,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 3
+; CursorPosition = 797
+; FirstLine = 80
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
