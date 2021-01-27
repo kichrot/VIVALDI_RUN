@@ -763,8 +763,11 @@ Procedure VivaldiKodeKeyWait()
             ElseIf TrigerAutoHide=1
                 If IsZoomed_(hWnd)=0
                     TrayWndAutoHide(0)
-                ElseIf GetForegroundWindow_()<>hWnd And GetForegroundWindow_()<>hWndTaskBar And WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0
-                    TrayWndAutoHide(0)   
+                ElseIf GetForegroundWindow_()<>hWnd And
+                       GetForegroundWindow_()<>hWndTaskBar And
+                       WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0 And
+                       WndEnumEx("#32770", ".*", "Y")=0
+                    TrayWndAutoHide(0)
                 EndIf
             EndIf
             Sleep_(0)
@@ -808,8 +811,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 797
-; FirstLine = 80
+; CursorPosition = 800
+; FirstLine = 93
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
