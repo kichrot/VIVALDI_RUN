@@ -1,4 +1,6 @@
-﻿; https://www.purebasic.fr/english/viewtopic.php?p=442019#p442019  Posted: Tue Apr 08, 2014 6:32 pm
+﻿; модуль получения командной строки чужого процесса
+; модуль реализован на основании функции WinAPI NtQueryInformationProcess
+; https://www.purebasic.fr/english/viewtopic.php?p=442019#p442019  Posted: Tue Apr 08, 2014 6:32 pm
 ; компилировать для 32-х и 64-х разрядных систем отдельно
 Structure UNICODE_STRING Align #PB_Structure_AlignC
     Length.w
@@ -223,8 +225,8 @@ Procedure.s NQIP_GetCommandLine(PID)
 EndProcedure
 ; Debug NQIP_GetCommandLine(22296)
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 100
-; FirstLine = 95
+; CursorPosition = 1
+; FirstLine = 99
 ; Folding = A-
 ; EnableXP
 ; CompileSourceDirectory

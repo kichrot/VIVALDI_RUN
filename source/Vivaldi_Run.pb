@@ -736,7 +736,7 @@ EndProcedure
 
 ; Процедура ожидания кодов клавиш
 Procedure VivaldiKodeKeyWait()
-    Protected counter, count, hWnd=0, hWnd_New=0
+    Protected counter, count, hWnd=0, hWnd_New=0, ProcessId_hWnd=0, ProcessId_hWnd_New=0
     hWnd=VivaldiWndEnumWait()
     Repeat 
         counter=0
@@ -758,19 +758,30 @@ Procedure VivaldiKodeKeyWait()
                 TrayWndAutoHide(0)
                 Break
             ElseIf TrigerAutoHide=1
-                If IsIconic_(hWnd)<>0
+                If IsZoomed_(hWnd)=0
                     TrayWndAutoHide(0)
                 ElseIf GetForegroundWindow_()<>hWnd And WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0
-                    TrayWndAutoHide(0)
+                    TrayWndAutoHide(0)   
                 EndIf
             EndIf
             Sleep_(0)
             ; проверяем окно VIVALDI переднем плане
-            If GetForegroundWindow_()<>hWnd
+            If GetForegroundWindow_()<>hWnd 
                 hWnd_New=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "Y")
                 If hWnd_New<>0
-                    hWnd=hWnd_New
-                    hWnd_New=0
+                    ; проверяем, что новое окно VIVALDI принадлежит к процессу текущего окна и не максимизировано (для некоторых окон расширений CHROME)
+                    GetWindowThreadProcessId_(hWnd, @ProcessId_hWnd) 
+                    GetWindowThreadProcessId_(hWnd_New, @ProcessId_hWnd_New) 
+                    If ProcessId_hWnd=ProcessId_hWnd_New
+                        If IsZoomed_(hWnd_New)<>0
+                            hWnd=hWnd_New
+                        EndIf   
+                    Else
+                        hWnd=hWnd_New
+                    EndIf
+                    hWnd_New=0 
+                    ProcessId_hWnd=0
+                    ProcessId_hWnd_New=0
                 EndIf
             EndIf
             hWndActiveWndVivaldi=hWnd
@@ -794,8 +805,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 783
-; FirstLine = 95
+; CursorPosition = 3
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
