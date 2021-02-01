@@ -336,6 +336,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
             ShowWindow_(TaskBar, SW_SHOW)
+            ShowWindow_(hWndActiveWndVivaldi, #SW_MAXIMIZE)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=1
             Else
@@ -811,8 +812,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 800
-; FirstLine = 93
+; CursorPosition = 801
+; FirstLine = 94
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
