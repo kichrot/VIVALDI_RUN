@@ -269,6 +269,8 @@ EndProcedure
 ; Процедура проверки на другие окна VIVALDI в одном процессе с активным окном (т.е. запущеных с одним пользовательским профилем)
 Procedure CheckingForOthersVivaldiWindowsInOneProcess()
     Protected ProcessId=0
+    hWndVivaldiForegroundWindowAndZoomed(0)=0
+    ReDim hWndVivaldiForegroundWindowAndZoomed(0)
     GetWindowThreadProcessId_(hWndActiveWndVivaldi, @ProcessId)  
     EnumWindows_(@EnumProcedure(), ProcessId)
 EndProcedure 
@@ -305,10 +307,13 @@ EndProcedure
 ; Процедура изменения режима автоскрытия панели задач 
 Procedure TrayWndAutoHide(AutoHide=1)
     Protected TaskBar=0, count=0, hWnd=0
-    hWnd=hWndActiveWndVivaldi
+    If GetForegroundWindow_()=hWndActiveWndVivaldi
+        hWnd=hWndActiveWndVivaldi
+    Else
+        hWndActiveWndVivaldi=GetForegroundWindow_()
+        hWnd=hWndActiveWndVivaldi
+    EndIf
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
-    ReDim hWndVivaldiForegroundWindowAndZoomed(0)
-    hWndVivaldiForegroundWindowAndZoomed(0)=0
     CheckingForOthersVivaldiWindowsInOneProcess()
     If hWndVivaldiForegroundWindowAndZoomed(0)<>0
         Repeat            
@@ -325,6 +330,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
         If SHAppBarMessage_(#ABM_GETSTATE, @aBdata)=#ABS_AUTOHIDE
             aBdata\lparam = #ABS_ALWAYSONTOP
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
+            SetActiveWindow_(hWnd)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=0
             Else
@@ -336,7 +342,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
             ShowWindow_(TaskBar, SW_SHOW)
-            ShowWindow_(hWndActiveWndVivaldi, #SW_MAXIMIZE)
+            ShowWindow_(hWnd, #SW_MAXIMIZE)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=1
             Else
@@ -351,6 +357,7 @@ Procedure TrayWndAutoHide(AutoHide=1)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata) 
         EndIf
+        SetActiveWindow_(hWnd)
         TrigerAutoHide=0
     EndIf
     If hWndVivaldiForegroundWindowAndZoomed(0)<>0
@@ -359,14 +366,16 @@ Procedure TrayWndAutoHide(AutoHide=1)
             ShowWindow_(hWndVivaldiForegroundWindowAndZoomed(count), #SW_SHOWNOACTIVATE)
             SetWindowPos_(hWndVivaldiForegroundWindowAndZoomed(count), hWnd, 0, 0, 0, 0, #SWP_NOACTIVATE)
             SetWindowPos_(hWnd, HWND_TOP, 0, 0, 0, 0, #SWP_NOMOVE | #SWP_NOSIZE)
-            BringWindowToTop_(hWnd) 
+            BringWindowToTop_(hWnd)
+            SetActiveWindow_(hWnd)
             SetFocus_(hWnd)
             count=count+1
         Until count>(ArraySize(hWndVivaldiForegroundWindowAndZoomed())-1)
-        ReDim hWndVivaldiForegroundWindowAndZoomed(0)
-        hWndVivaldiForegroundWindowAndZoomed(0)=0
         count=0
     EndIf
+    SetActiveWindow_(hWnd)
+    hWndVivaldiForegroundWindowAndZoomed(0)=0
+    ReDim hWndVivaldiForegroundWindowAndZoomed(0)
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
 EndProcedure
 
@@ -812,8 +821,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 801
-; FirstLine = 94
+; CursorPosition = 810
+; FirstLine = 93
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
