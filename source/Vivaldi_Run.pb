@@ -337,12 +337,12 @@ Procedure TrayWndAutoHide(AutoHide=1)
                 TrigerAutoHide=1
             EndIf   
         Else
+            ShowWindow_(hWnd, #SW_MAXIMIZE)
             ShowWindow_(TaskBar, SW_HIDE)
             Delay(200)
             aBdata\lparam = #ABS_AUTOHIDE
             SHAppBarMessage_(#ABM_SETSTATE, @aBdata)
             ShowWindow_(TaskBar, SW_SHOW)
-            ShowWindow_(hWnd, #SW_MAXIMIZE)
             If AutoHideTrayWnd=0
                 TrigerAutoHide=1
             Else
@@ -782,7 +782,7 @@ Procedure VivaldiKodeKeyWait()
             EndIf
             Sleep_(0)
             ; проверяем окно VIVALDI переднем плане
-            If GetForegroundWindow_()<>hWnd 
+            If GetForegroundWindow_()<>hWndActiveWndVivaldi 
                 hWnd_New=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "Y")
                 If hWnd_New<>0
                     ; проверяем, что новое окно VIVALDI принадлежит к процессу текущего окна и не максимизировано (для некоторых окон расширений CHROME)
@@ -822,7 +822,7 @@ VivaldiKodeKeyWait()
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
 ; CursorPosition = 810
-; FirstLine = 93
+; FirstLine = 95
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
