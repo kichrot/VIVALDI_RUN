@@ -507,6 +507,50 @@ Procedure RunVIVALDI()
     ; Получаем параметры командной строки для файла Vivaldi_Run.exe
     Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
     
+    ; реализация фильтра по адресам из командной строки
+    ; Проверяем наличие и размер файла BLACK_LIST_URL.txt
+    If FileSize("BLACK_LIST_URL.txt") < 0 
+        CreateFile(0, "BLACK_LIST_URL.txt")
+        CloseFile(#PB_All)
+    Else
+        If Command_Line_Vivaldi_Run<>""
+            ReadFile(1,"BLACK_LIST_URL.txt") ; Открываем файл
+            Size=Lof(1)                      ; Узнаём размер файла 
+            CloseFile(1)                     ; Закрываем файл
+            If Size > 0
+                Protected OpFile,StringFormat, i
+                ; Создаем и заполняем массив BLACK_LIST_URL
+                Protected Dim BLACK_LIST_URL.s(0)
+                If OpenFile(OpFile, "BLACK_LIST_URL.txt")   
+                    While Eof(OpFile) = 0              ; пока не прочли весь файл
+                        StringFormat = ReadStringFormat(OpFile)
+                        If StringFormat = #PB_Ascii
+                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_Ascii)  ; читает строки как ASCII построчно
+                        ElseIf StringFormat = #PB_UTF8
+                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_UTF8)  ; читает строки как UTF8 построчно
+                        ElseIf StringFormat = #PB_Unicode
+                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_Unicode)  ; читает строки как UTF16 построчно
+                        EndIf
+                        i=i+1
+                    Wend
+                    CloseFile(OpFile)
+                EndIf 
+                ; ищем черные URL  командной строке и если находим то закрываем Vivaldi_Run
+                i=0
+                Repeat  
+                    If  i>ArraySize(BLACK_LIST_URL()) 
+                        Break 
+                    EndIf 
+                    If  FindString(Command_Line_Vivaldi_Run, BLACK_LIST_URL(i))>0
+                        End  
+                    EndIf
+                    i=i+1
+                ForEver   
+            EndIf    
+        EndIf   
+    EndIf
+    
+    
     ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
     ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
     CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
@@ -821,7 +865,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 810
+; CursorPosition = 854
 ; FirstLine = 95
 ; Folding = AAAw
 ; EnableXP
