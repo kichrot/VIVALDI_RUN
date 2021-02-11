@@ -486,7 +486,7 @@ Procedure RunVIVALDI()
     Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run, ParametrRFCLP.s=""
     Protected Dim ParamVivaldi_Run.s(0)
     Protected Dim FileNameCommandLineVivaldi.s(0)
-    
+        
     ; проверяем разрядность OS
     If OSbits()=32 And #PB_Compiler_Processor=#PB_Processor_x64
         MessageRequester("Vivaldi_Run", "For your OS, use the 32-bit version of Vivaldi_Run.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL) 
@@ -525,13 +525,14 @@ Procedure RunVIVALDI()
                     While Eof(OpFile) = 0              ; пока не прочли весь файл
                         StringFormat = ReadStringFormat(OpFile)
                         If StringFormat = #PB_Ascii
-                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_Ascii)  ; читает строки как ASCII построчно
+                            BLACK_LIST_URL.s(i) =  Trim(ReadString(OpFile,#PB_Ascii))  ; читает строки как ASCII построчно
                         ElseIf StringFormat = #PB_UTF8
-                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_UTF8)  ; читает строки как UTF8 построчно
+                            BLACK_LIST_URL.s(i) =  Trim(ReadString(OpFile,#PB_UTF8))  ; читает строки как UTF8 построчно
                         ElseIf StringFormat = #PB_Unicode
-                            BLACK_LIST_URL.s(i) =  ReadString(OpFile,#PB_Unicode)  ; читает строки как UTF16 построчно
+                            BLACK_LIST_URL.s(i) =  Trim(ReadString(OpFile,#PB_Unicode))  ; читает строки как UTF16 построчно
                         EndIf
                         i=i+1
+                        ReDim BLACK_LIST_URL.s(i)
                     Wend
                     CloseFile(OpFile)
                 EndIf 
@@ -541,11 +542,13 @@ Procedure RunVIVALDI()
                     If  i>ArraySize(BLACK_LIST_URL()) 
                         Break 
                     EndIf 
-                    If  FindString(Command_Line_Vivaldi_Run, BLACK_LIST_URL(i))>0
+                    If  FindString(Command_Line_Vivaldi_Run, BLACK_LIST_URL(i))>0 And BLACK_LIST_URL(i)<>""
                         End  
                     EndIf
                     i=i+1
-                ForEver   
+                ForEver
+                BLACK_LIST_URL.s(0)=""
+                ReDim BLACK_LIST_URL.s(0)
             EndIf    
         EndIf   
     EndIf
@@ -865,7 +868,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 854
+; CursorPosition = 857
 ; FirstLine = 95
 ; Folding = AAAw
 ; EnableXP
