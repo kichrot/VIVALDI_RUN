@@ -580,17 +580,18 @@ Procedure RunVIVALDI()
     Else
         Command_Line=Command_Line_Vivaldi_Run+" "+Command_Line
         
-        ; Проверяем наличие в параметрах коммандной строки параметра мини режима --only-start-with-VIVALDI_COMMAND_LINE.txt
-        CreateRegularExpression(3, "--only-start-with-VIVALDI_COMMAND_LINE.txt")
+        ; проверяем наличие в параметрах коммандной строки параметра мини режима  --OSWVCL
+        CreateRegularExpression(3, "--OSWVCL")
         CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
-        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --only-start-with-VIVALDI_COMMAND_LINE.txt
+        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --OSWVCL
         FreeRegularExpression(3)
+        ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
         If CountParamVivaldi_Run>0
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
             End
         EndIf  
         
-        ; Удаляем параметр --RFCLP
+        ; удаляем параметр --RFCLP
         CreateRegularExpression(3, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1") 
         Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --RFCLP
         FreeRegularExpression(3)
@@ -599,7 +600,7 @@ Procedure RunVIVALDI()
         RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line,"", #PB_Program_Open)
     EndIf
     
-    ;Запрет/проверка на запуск Vivaldi_Run.exe более одного раза
+    ;запрет/проверка на запуск Vivaldi_Run.exe более одного раза
     CheckRun("Vivaldi_Run.exe")
     
     ; меняем приоритет своего процесса
@@ -869,7 +870,7 @@ VivaldiKodeKeyWait()
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
 ; CursorPosition = 857
-; FirstLine = 95
+; FirstLine = 91
 ; Folding = AAAw
 ; EnableXP
 ; CompileSourceDirectory
