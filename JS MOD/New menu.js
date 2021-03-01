@@ -38,7 +38,8 @@ ModMenuHidden = function (e) {
     browser.removeEventListener('mousedown', ModMenuHidden);
     browser.removeEventListener('click', ModMenuHidden);
     browser.removeEventListener('contextmenu', ModMenuHidden);
-    document.querySelector("#ButtonModMenu > button > svg").style.transform = "scale(1)";
+    /*document.querySelector("#ButtonModMenu > button > svg").style.transform = "scale(1)";*/
+    /*document.querySelector("#ButtonModMenu > button > svg").style.zoom = "130%";*/
 };
 
 function CreateNewButtonMenu(toolbarNewButton, titleNewButton, svgNewButton) {
@@ -66,7 +67,8 @@ function CreateNewButtonMenu(toolbarNewButton, titleNewButton, svgNewButton) {
         }
         if (ModMenu.style.visibility == "hidden") {
             ModMenu.style.cssText = ModMenucssText + 'visibility: visible;'; 
-            document.querySelector("#ButtonModMenu > button > svg").style.transform = "scale(0.7)";
+            /*document.querySelector("#ButtonModMenu > button > svg").style.transform = "scale(0.7)";*/
+            /*document.querySelector("#ButtonModMenu > button > svg").style.zoom = "115%";*/
         } else {
             ModMenuHidden();
         }
@@ -136,7 +138,7 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
         setTimeout(
             () => {
                 document.title = OLD_title;
-            }, 50);
+            }, 100);
         ModMenuHidden();
     }
 
@@ -184,8 +186,6 @@ function CreateNewItem(KEYPRESS_NewItem, classNewItem, toolbarNewItem, svgNewIte
         }
     }, 300);
 }
-
-
 ///////////////////////////////////////////// Завершение неизменяемой части /  The completion of the unchanged parts //////////////////////////////////////////////////////////////////////
 
 
