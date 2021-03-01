@@ -243,7 +243,7 @@ var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="2
 CreateNewButton(NewButton_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
 /* Кнопка "Блокнот" / The Button "Notepad" */
-var NewButton_KEYPRESS = '"11" |C:/Program Files (x86)/AkelPad/AkelPad.exe|';
+var NewButton_KEYPRESS = '"11" |C:/Windows/System32/notepad.exe|';
 var NewButtonClass = 'mod-notepad';
 var NewButtonToolbar = 'div#ModPanel';
 var NewButtonTitle = 'Блокнот / Notepad';
@@ -251,7 +251,7 @@ var NewButtonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="2
 CreateNewButton(NewButton_KEYPRESS, NewButtonClass, NewButtonToolbar, NewButtonTitle, NewButtonSvg);
 
 /* Кнопка "Калькулятор" / Button "Calculator" */
-var NewButton_KEYPRESS = '"11" |C:/Windows/System32/calc1.exe| ';
+var NewButton_KEYPRESS = '"11" |C:/Windows/System32/calc.exe| ';
 var NewButtonClass = 'mod-calculator';
 var NewButtonToolbar = 'div#ModPanel';
 var NewButtonTitle = 'Калькулятор / Calculator';
