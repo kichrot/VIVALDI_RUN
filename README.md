@@ -1,6 +1,6 @@
 # VIVALDI_RUN
 
-The "Vivaldi_Run" program is a 32-bit Windows application that runs in the background and does not require user intervention, except for the initial settings described later in this guide. The program is characterized by low consumption of PC resources, below the level of most extensions for the Google Chrome browser with similar functionality.
+The "Vivaldi_Run" program is a Windows application that runs in the background and does not require user intervention, except for the initial settings described later in this guide. The program is characterized by low consumption of PC resources, below the level of most extensions for the Google Chrome browser with similar functionality.
 
 Purpose of the "Vivaldi_Run" program.
 
@@ -12,7 +12,7 @@ Providing the functionality of the buttons created by the user, the program "Viv
 
 # VIVALDI_RUN
 
-Программа "Vivaldi_Run" - это 32-разрядное приложение Windows, которое работает в фоновом режиме и не требует вмешательства пользователя, за исключением начальных настроек, описанных в Руководстве пользователя. Программа характеризуется низким потреблением ресурсов ПК, ниже уровня большинства расширений для браузера Google Chrome с похожими функциональными возможностями.
+Программа "Vivaldi_Run" - это приложение Windows, которое работает в фоновом режиме и не требует вмешательства пользователя, за исключением начальных настроек, описанных в Руководстве пользователя. Программа характеризуется низким потреблением ресурсов ПК, ниже уровня большинства расширений для браузера Google Chrome с похожими функциональными возможностями.
 
 Назначение программы "Vivaldi_Run".
 
