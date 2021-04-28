@@ -761,7 +761,11 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; стандартные кнопки
                     KeybdEvent(50, Val(VirtKeyCode(k)))
                 EndIf
-            Else    
+            Else 
+                If Val(VirtKeyCode(0))=18 And (Val(VirtKeyCode(1))=107 Or Val(VirtKeyCode(1))=109)
+                    ; перевод фокуса на страницу
+                    KeybdEvent(100, 120)
+                EndIf
                 For k = 0 To CountKodeKey-1
                     keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
                 Next
@@ -870,8 +874,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 611
-; FirstLine = 91
-; Folding = AAAx
+; CursorPosition = 766
+; FirstLine = 208
+; Folding = AAA2
 ; EnableXP
 ; CompileSourceDirectory
