@@ -672,8 +672,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     ; TextTitleRegExp - имя окна в формате регулярного выражения
     ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, hWndDevTool, name.s = Space(256),  name2.s = Space(256),CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
-    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
+    Protected hWnd, hWndDevTool, name.s = Space(256),  name2.s = Space(256), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0
+    Protected Dim FocusPage.s(0), Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
         ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
@@ -686,11 +686,14 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                 OnNumLock=1
                 KeybdEvent(50, #VK_NUMLOCK)
             EndIf
+            ;проверка на наличие команды перевода фокуса на страницу "{FP}"
+            CreateRegularExpression(2, "(?<=()\{)\S([FP])(?=()\})") 
+            If MatchRegularExpression(2, name)
+                ; перевод фокуса на страницу
+                KeybdEvent(100, 120)    
+            EndIf
+            FreeRegularExpression(2)
             If CountKodeKey=1
-                If Val(VirtKeyCode(0))=35 Or Val(VirtKeyCode(0))=36 Or Val(VirtKeyCode(0))=22
-                    ; перевод фокуса на страницу
-                    KeybdEvent(100, 120)
-                EndIf
                 If Val(VirtKeyCode(0))=0
                     ; Реализация рестарта VIVALDI
                     VivaldiClipboardAddress("vivaldi://restart")
@@ -762,10 +765,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     KeybdEvent(50, Val(VirtKeyCode(k)))
                 EndIf
             Else 
-                If Val(VirtKeyCode(0))=18 And (Val(VirtKeyCode(1))=107 Or Val(VirtKeyCode(1))=109)
-                    ; перевод фокуса на страницу
-                    KeybdEvent(100, 120)
-                EndIf
                 For k = 0 To CountKodeKey-1
                     keybd_event_(Val(VirtKeyCode(k)), 0, 0, 0)
                 Next
@@ -874,8 +873,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 766
-; FirstLine = 208
-; Folding = AAA2
+; CursorPosition = 684
+; FirstLine = 176
+; Folding = AEA9
 ; EnableXP
 ; CompileSourceDirectory
