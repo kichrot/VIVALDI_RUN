@@ -758,6 +758,8 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     OpenURLinVivaldiForegroundWindow(PageAddress(0))
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=22
+                    ; перевод фокуса на страницу
+                    KeybdEvent(100, 120)    
                     ; включение/выключение автоскрытия панели задач
                     TrayWndAutoHide(1)
                 Else
@@ -873,8 +875,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 684
-; FirstLine = 176
+; CursorPosition = 760
+; FirstLine = 248
 ; Folding = AEA9
 ; EnableXP
 ; CompileSourceDirectory
