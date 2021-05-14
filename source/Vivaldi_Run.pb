@@ -664,32 +664,18 @@ Procedure OpenURLinVivaldiForegroundWindow(URL.s)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
-; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
-Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
-    ; Проверяет существование активного окна с задаными классом и именем
-    ; извлекает из имени окна коды виртуальных клавиш и эмулирует их нажатие для найденного окна 
-    ; Параметры:
-    ; Class - класс окна
-    ; TextTitleRegExp - имя окна в формате регулярного выражения
-    ; VirtKeyRegExp - регулярное выражение для извлечения кодов виртуальных клавиш из имени найденного окна
-    ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, hWndDevTool, name.s = Space(512),  name2.s = Space(512), CountKodeKey,  CountCommandLineParameters, ClipboardText.s,  OnNumLock=0, AdditionalCountKodeKey
-    Protected Dim FocusPage.s(0), Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0), Dim AdditionalVirtKeyCode.s(0), Dim AddVirtKeyCode.s(0) 
-    hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
-    If hWnd>0
-        ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
-        ChangeProcessPriorityVivaldi(#HIGH_PRIORITY_CLASS)
-        CreateRegularExpression(1, VirtKeyRegExp)
-        GetWindowText_(hWnd, @name, 512)
-        If MatchRegularExpression(1, name)
-            CountKodeKey=ExtractRegularExpression(1, name, VirtKeyCode.s())
-            If GetKeyState_(#VK_NUMLOCK)=1
-                OnNumLock=1
-                KeybdEvent(50, #VK_NUMLOCK)
-            EndIf
-            ;проверка на наличие команды перевода фокуса на страницу "{FP}"
+; Процедура получения и применения виртуальных кодов клавиш
+Procedure KodeKey(KeyboardShortcut.s)
+    ; Возвращает: 1 - если коды клавиш извлечены и эмуляция нажатий клавиш произведена.
+    Protected hWndDevTool, CountKodeKey, CountCommandLineParameters, ClipboardText.s
+    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0)
+    
+        CreateRegularExpression(1, "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")
+        If MatchRegularExpression(1, KeyboardShortcut)
+            CountKodeKey=ExtractRegularExpression(1, KeyboardShortcut, VirtKeyCode.s())
+                        ;проверка на наличие команды перевода фокуса на страницу "{FP}"
             CreateRegularExpression(2, "(?<=()\{)\S([FP])(?=()\})") 
-            If MatchRegularExpression(2, name)
+            If MatchRegularExpression(2, KeyboardShortcut)
                 ; перевод фокуса на страницу
                 KeybdEvent(100, 120)    
             EndIf
@@ -702,9 +688,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; Открыть DevTools для интерфейса VIVALDI 
                     Protected counter=0
                     hWndDevTool=0
-;                     If TrigerAutoHide=1
-;                         TrayWndAutoHide(0)
-;                     EndIf    
                     If WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")<>0
                         hWndDevTool=WndEnumEx("Chrome_WidgetWin_1", "DevTools - chrome-extension://mpognobbkildjkofajifpdfhcoklimli/browser.html", "N")
                         SetForegroundWindow_(hWndDevTool)
@@ -737,7 +720,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                         TrayWndAutoHide(0)
                     EndIf    
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    CountCommandLineParameters=ExtractRegularExpression(2, name, CommandLineParameters())
+                    CountCommandLineParameters=ExtractRegularExpression(2, KeyboardShortcut, CommandLineParameters())
                     If CountCommandLineParameters=1
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "")
                     ElseIf  CountCommandLineParameters>1 
@@ -748,14 +731,14 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, name, PageAddress())
+                    ExtractRegularExpression(2, KeyboardShortcut, PageAddress())
                     Delay(100)
                     VivaldiClipboardAddress(PageAddress(0))
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=15
                     ; Открытие страницы, по заданному адресу, в новой вкладке
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, name, PageAddress())
+                    ExtractRegularExpression(2, KeyboardShortcut, PageAddress())
                     OpenURLinVivaldiForegroundWindow(PageAddress(0))
                     FreeRegularExpression(2)
                 ElseIf Val(VirtKeyCode(0))=22
@@ -776,39 +759,48 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
                     keybd_event_(Val(VirtKeyCode(k)), 0, #KEYEVENTF_KEYUP, 0)
                 Next
             EndIf
-            ; проверка на наличие дополнительных сочетаний кодов клавиш заключенных в квадратные скобки ( [] )
-            ; выполнение в случае их наличия
-            Delay(100)
-            CreateRegularExpression(2, "(?<=()\[)(.*?)(?=()\])")
-            CreateRegularExpression(3, "(?<=()\()(.*?)(?=()\))")
-            If MatchRegularExpression(2, name)
-                AdditionalCountKodeKey=ExtractRegularExpression(2, name, AdditionalVirtKeyCode.s())
-                For z = 0 To AdditionalCountKodeKey-1
-                    If MatchRegularExpression(3, AdditionalVirtKeyCode.s(z))
-                        CountKodeKey=ExtractRegularExpression(3, AdditionalVirtKeyCode.s(z), AddVirtKeyCode.s())
-                        For k = 0 To CountKodeKey-1
-                            keybd_event_(Val(AddVirtKeyCode.s(k)), 0, 0, 0)
-                        Next
-                        Delay(100)
-                        For k=CountKodeKey-1 To 0 Step -1
-                            keybd_event_(Val(AddVirtKeyCode.s(k)), 0, #KEYEVENTF_KEYUP, 0)
-                        Next
-                    EndIf   
-                Next
-            EndIf
-            FreeRegularExpression(2)
-            FreeRegularExpression(3)
-            
-            If OnNumLock=1
-                KeybdEvent(50, #VK_NUMLOCK)
-            EndIf
         Else
             FreeRegularExpression(1)
-            ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
-            ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
             ProcedureReturn 0   
         EndIf   
+    
+    FreeRegularExpression(1)
+    ProcedureReturn 1 
+EndProcedure
+
+; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
+Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
+; Проверяет существование активного окна с задаными классом и именем
+    ; извлекает из имени окна коды виртуальных клавиш и эмулирует их нажатие для найденного окна 
+    ; Параметры:
+    ; Class - класс окна
+    ; TextTitleRegExp - имя окна в формате регулярного выражения
+    ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
+    Protected hWnd, name.s = Space(512),  name2.s = Space(512), OnNumLock=0, AdditionalCountKodeKey
+    Protected Dim AdditionalVirtKeyCode.s(0) 
+    hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
+    If hWnd>0
+        ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
+        ChangeProcessPriorityVivaldi(#HIGH_PRIORITY_CLASS)
+        If GetKeyState_(#VK_NUMLOCK)=1
+            OnNumLock=1
+            KeybdEvent(50, #VK_NUMLOCK)
+        EndIf
+        CreateRegularExpression(4, "(?<=()\[)(.*?)(?=()\])")
+        GetWindowText_(hWnd, @name, 512)
+        If MatchRegularExpression(4, name)
+            AdditionalCountKodeKey=ExtractRegularExpression(4, name, AdditionalVirtKeyCode.s())
+            For z = 0 To AdditionalCountKodeKey-1
+                KodeKey(AdditionalVirtKeyCode.s(z))
+                Delay(50)
+            Next
+        Else
+            KodeKey(name)    
+        EndIf
     Else
+        If OnNumLock=1
+            KeybdEvent(50, #VK_NUMLOCK)
+        EndIf
         ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
         ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
         ProcedureReturn 0
@@ -817,10 +809,13 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s, VirtKeyRegExp.s)
     If name=name2
         SetWindowText_(hWnd,"  - Vivaldi")
     EndIf    
-    FreeRegularExpression(1)
+    FreeRegularExpression(4)
+    If OnNumLock=1
+        KeybdEvent(50, #VK_NUMLOCK)
+    EndIf
     ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
     ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
-    ProcedureReturn 1 
+    ProcedureReturn 1     
 EndProcedure
 
 ; Процедура ожидания кодов клавиш
@@ -836,7 +831,7 @@ Procedure VivaldiKodeKeyWait()
             Repeat
                 count=count+1   
                 ; ищем и окно VIVALDI  с кодом клавиш и получаем коды
-                If VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s", "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")=1
+                If VivaldiKodeKey("Chrome_WidgetWin_1", "\A(VIVALDI_EMULATE_KEYPRESS)\s")=1
                     Delay(500)
                 Else
                     Delay(30)
@@ -898,8 +893,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 783
-; FirstLine = 191
-; Folding = AAA1
+; CursorPosition = 819
+; FirstLine = 62
+; Folding = AAAg
 ; EnableXP
 ; CompileSourceDirectory
