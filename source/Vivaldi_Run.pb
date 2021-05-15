@@ -798,11 +798,6 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
             KodeKey(name)    
         EndIf
     Else
-        If OnNumLock=1
-            KeybdEvent(50, #VK_NUMLOCK)
-        EndIf
-        ChangeProcessPriorityVivaldi_Run(#BELOW_NORMAL_PRIORITY_CLASS)
-        ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
         ProcedureReturn 0
     EndIf
     GetWindowText_(hWnd, @name2, 2048)
@@ -893,8 +888,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 882
-; FirstLine = 162
+; CursorPosition = 801
+; FirstLine = 161
 ; Folding = AEAg
 ; EnableXP
 ; CompileSourceDirectory
