@@ -206,8 +206,8 @@ Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s)
         clas.s= Space(256) 
         GetClassName_(hWnd, @clas, 256)
         If clas=Class
-            name.s = Space(512)
-            GetWindowText_(hWnd, @name, 512)
+            name.s = Space(2048)
+            GetWindowText_(hWnd, @name, 2048)
             If MatchRegularExpression(0, name)
                 return_proc=hWnd
             EndIf
@@ -226,8 +226,8 @@ Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s)
                 GetClassName_(hWnd, @clas, 256)
                 If IsWindowVisible_(hWnd)  
                     If clas=Class
-                        name.s = Space(512)
-                        GetWindowText_(hWnd, @name, 512)
+                        name.s = Space(2048)
+                        GetWindowText_(hWnd, @name, 2048)
                         If MatchRegularExpression(0, name)
                             return_proc=hWnd
                         EndIf
@@ -776,7 +776,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
     ; Class - класс окна
     ; TextTitleRegExp - имя окна в формате регулярного выражения
     ; Возвращает: 1 - если окно найдено, коды клавиш извлечены и эмуляция нажатий клавиш произведена.
-    Protected hWnd, name.s = Space(512),  name2.s = Space(512), OnNumLock=0, AdditionalCountKodeKey
+    Protected hWnd, name.s = Space(2048),  name2.s = Space(2048), OnNumLock=0, AdditionalCountKodeKey
     Protected Dim AdditionalVirtKeyCode.s(0) 
     hWnd = WndEnumEx(Class, TextTitleRegExp, "Y")
     If hWnd>0
@@ -787,7 +787,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
             KeybdEvent(50, #VK_NUMLOCK)
         EndIf
         CreateRegularExpression(4, "(?<=()\[)(.*?)(?=()\])")
-        GetWindowText_(hWnd, @name, 512)
+        GetWindowText_(hWnd, @name, 2048)
         If MatchRegularExpression(4, name)
             AdditionalCountKodeKey=ExtractRegularExpression(4, name, AdditionalVirtKeyCode.s())
             For z = 0 To AdditionalCountKodeKey-1
@@ -805,7 +805,7 @@ Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
         ChangeProcessPriorityVivaldi(#NORMAL_PRIORITY_CLASS)
         ProcedureReturn 0
     EndIf
-    GetWindowText_(hWnd, @name2, 512)
+    GetWindowText_(hWnd, @name2, 2048)
     If name=name2
         SetWindowText_(hWnd,"  - Vivaldi")
     EndIf    
@@ -893,8 +893,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 819
-; FirstLine = 62
-; Folding = AAAg
+; CursorPosition = 882
+; FirstLine = 162
+; Folding = AEAg
 ; EnableXP
 ; CompileSourceDirectory
