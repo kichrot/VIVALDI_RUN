@@ -7,16 +7,16 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-05-15 18:44" user="User" host="OLEG-OV"/>
+    <lastopen date="2021-07-13 15:54" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="NQIP.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate=""/>
-      <fingerprint md5="437831f1fac26cd1cd76d34c7146fbc5"/>
+      <fingerprint md5="d0b15697334d301d54d6775dab092760"/>
     </file>
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="f027a1fb6a5b368ca2e7dfbf9524cc5f"/>
+      <fingerprint md5="e1ece991e8da34478e0573b95bd357b9"/>
     </file>
   </section>
   <section name="targets">
@@ -33,12 +33,12 @@
       <debugger custom="1" type="ide"/>
       <warnings custom="1" type="display"/>
       <versioninfo enable="1">
-        <field0 value="0.1.9.0"/>
-        <field1 value="0.1.9.0"/>
+        <field0 value="0.2.0.0"/>
+        <field1 value="0.2.0.0"/>
         <field2 value="kichrot"/>
         <field3 value="Vivaldi_RUN"/>
-        <field4 value="0.1.9.0"/>
-        <field5 value="0.1.9.0"/>
+        <field4 value="0.2.0.0"/>
+        <field5 value="0.2.0.0"/>
         <field6 value="Utility to VIVALDI browser"/>
         <field7 value="Vivaldi_RUN.exe"/>
         <field8 value="Vivaldi_RUN.exe"/>

@@ -483,10 +483,12 @@ EndProcedure
 
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
-    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run, ParametrRFCLP.s=""
+    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
+    Protected ParametrRFCLP.s="", ParametrREBSV.s="", Program=0
     Protected Dim ParamVivaldi_Run.s(0)
     Protected Dim FileNameCommandLineVivaldi.s(0)
-        
+    Protected Dim ProgramTo.s(0)
+    
     ; проверяем разрядность OS
     If OSbits()=32 And #PB_Compiler_Processor=#PB_Processor_x64
         MessageRequester("Vivaldi_Run", "For your OS, use the 32-bit version of Vivaldi_Run.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL) 
@@ -555,13 +557,19 @@ Procedure RunVIVALDI()
     
     
     ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
+    ; параметр указывающий имя файла с параметрами запуска VIVALDI вместо стандартного VIVALDI_COMMAND_LINE.txt
     ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
-    CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
-    ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
-    FreeRegularExpression(3)
-    
-    ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
     If ParametrRFCLP<>""
+        CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
+        ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
+        FreeRegularExpression(3)
+        
+        ; удаляем параметр --RFCLP
+        CreateRegularExpression(3, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1") 
+        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --RFCLP
+        FreeRegularExpression(3)
+        
+        ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
         NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
     EndIf
     
@@ -572,7 +580,7 @@ Procedure RunVIVALDI()
     Else
         Command_Line = LoadFromFile(NameFileCommandLineVivaldi)
     EndIf
-    
+
     ; Проверяем наличие файла vivaldi.exe
     If FileSize("vivaldi.exe")=-1 
         MessageRequester("Vivaldi_Run", "File vivaldi.exe not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
@@ -580,21 +588,33 @@ Procedure RunVIVALDI()
     Else
         Command_Line=Command_Line_Vivaldi_Run+" "+Command_Line
         
+        
+        ; проверяем наличие в параметрах коммандной строки параметра --REBSV 
+        ; (--REBSV - запуск произвольного исполняемого файла перед стартом VIVALDI)
+        ParametrREBSV=CheckParametr(Command_Line, "--REBSV=(["+Chr(34)+"])(\\?.)*?\1")
+        If ParametrREBSV<>""
+            CreateRegularExpression(4, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
+            ExtractRegularExpression(4, ParametrREBSV, ProgramTo())
+            Program=RunProgram(ProgramTo(0),"","", #PB_Program_Open)
+            If Program=0
+                MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramTo(0), #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+            EndIf
+            ; удаляем параметр --REBSV
+            Command_Line = ReplaceRegularExpression(3, Command_Line, " ")
+            FreeRegularExpression(4)
+        EndIf
+                
         ; проверяем наличие в параметрах коммандной строки параметра мини режима  --OSWVCL
         CreateRegularExpression(3, "--OSWVCL")
         CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
-        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --OSWVCL
+        ; удаляем параметр --OSWVCL
+        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") 
         FreeRegularExpression(3)
         ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
         If CountParamVivaldi_Run>0
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
             End
         EndIf  
-        
-        ; удаляем параметр --RFCLP
-        CreateRegularExpression(3, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1") 
-        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --RFCLP
-        FreeRegularExpression(3)
         
         ; запускаем VIVALDI
         RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line,"", #PB_Program_Open)
@@ -888,8 +908,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 801
-; FirstLine = 161
-; Folding = AEAg
+; CursorPosition = 609
+; FirstLine = 90
+; Folding = IAQg
 ; EnableXP
 ; CompileSourceDirectory
