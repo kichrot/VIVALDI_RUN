@@ -483,8 +483,8 @@ EndProcedure
 
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
-    Protected Command_Line.s="", CountParam, Command_Line_Vivaldi_Run.s="",  CountParamVivaldi_Run
-    Protected ParametrRFCLP.s="", ParametrREBSV.s="", Program=0
+    Protected Command_Line.s="", Command_Line_Vivaldi_Run.s=""
+    Protected ParametrRFCLP.s="", ParametrREBSV.s="", ParametrOSWVCL.s="", Program=0
     Protected Dim ParamVivaldi_Run.s(0)
     Protected Dim FileNameCommandLineVivaldi.s(0)
     Protected Dim ProgramTo.s(0)
@@ -500,6 +500,7 @@ Procedure RunVIVALDI()
     
     ; заполняем глобальную переменную AutoHideTrayWnd
     Set_AutoHideTrayWnd()
+    
     ; меняем приоритет своего процесса
     ChangeProcessPriorityVivaldi_Run(#HIGH_PRIORITY_CLASS)
     
@@ -605,13 +606,13 @@ Procedure RunVIVALDI()
         EndIf
                 
         ; проверяем наличие в параметрах коммандной строки параметра мини режима  --OSWVCL
-        CreateRegularExpression(3, "--OSWVCL")
-        CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
-        ; удаляем параметр --OSWVCL
-        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") 
-        FreeRegularExpression(3)
-        ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
-        If CountParamVivaldi_Run>0
+        ParametrOSWVCL=CheckParametr(Command_Line, "--OSWVCL")
+        If ParametrREBSV<>""
+            ; удаляем параметр --OSWVCL
+            CreateRegularExpression(3, "--OSWVCL")
+            Command_Line = ReplaceRegularExpression(3, Command_Line, " ") 
+            FreeRegularExpression(3)
+            ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
             End
         EndIf  
@@ -908,8 +909,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 609
-; FirstLine = 90
+; CursorPosition = 485
+; FirstLine = 87
 ; Folding = IAQg
 ; EnableXP
 ; CompileSourceDirectory
