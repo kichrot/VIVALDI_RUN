@@ -8,6 +8,9 @@ XIncludeFile "NQIP.pbi"
 
 ; ////////////////// Глобальные переменные и константы ////////////////////////////
 
+; глобальная переменная c с именем исполняемого файла запускаемым при закрытии VIVALDI
+Global VivaldiExitRunFile.s=""
+
 ; глобальная переменная о состоянии автоскрытия панели задач. с которым был запущен VIVALDI
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
 Global AutoHideTrayWnd=0
@@ -188,7 +191,7 @@ EndProcedure
 
 ; Процедура поиска окон
 Procedure WndEnumEx(Class.s, TextTitleRegExp.s, WndForeground.s) 
-    ; Проверяет существование окон по классу и имени окна в фрмате рег. выражений
+    ; Проверяет существование окон по классу и имени окна в формате рег. выражений
     ; Параметры:
     ; Class - класс окна
     ; TextTitleRegExp - имя окна в формате регулярного выражения
@@ -481,10 +484,19 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
     EndIf
 EndProcedure
 
+; Процедура удаления параметра коммандной строки Vivaldi_Run из командной строки VIVALDI
+Procedure.s DelParametrVivaldi_Run(Parametr.s, Command_Line.s)
+    Protected CommandLine.s=""
+    CreateRegularExpression(3, Parametr)
+    CommandLine = ReplaceRegularExpression(3, Command_Line, " ")
+    FreeRegularExpression(3)
+    ProcedureReturn CommandLine
+EndProcedure
+
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
     Protected Command_Line.s="", Command_Line_Vivaldi_Run.s=""
-    Protected ParametrRFCLP.s="", ParametrREBSV.s="", ParametrOSWVCL.s="", Program=0
+    Protected ParametrRFCLP.s="", ParametrREBSV.s="", ParametrREBEV.s="", ParametrOSWVCL.s="", Program=0
     Protected Dim ParamVivaldi_Run.s(0)
     Protected Dim FileNameCommandLineVivaldi.s(0)
     Protected Dim ProgramTo.s(0)
@@ -525,7 +537,7 @@ Procedure RunVIVALDI()
                 ; Создаем и заполняем массив BLACK_LIST_URL
                 Protected Dim BLACK_LIST_URL.s(0)
                 If OpenFile(OpFile, "BLACK_LIST_URL.txt")   
-                    While Eof(OpFile) = 0              ; пока не прочли весь файл
+                    While Eof(OpFile) = 0 ; пока не прочли весь файл
                         StringFormat = ReadStringFormat(OpFile)
                         If StringFormat = #PB_Ascii
                             BLACK_LIST_URL.s(i) =  Trim(ReadString(OpFile,#PB_Ascii))  ; читает строки как ASCII построчно
@@ -566,10 +578,8 @@ Procedure RunVIVALDI()
         FreeRegularExpression(3)
         
         ; удаляем параметр --RFCLP
-        CreateRegularExpression(3, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1") 
-        Command_Line = ReplaceRegularExpression(3, Command_Line, " ") ; удаляем параметр --RFCLP
-        FreeRegularExpression(3)
-        
+        Command_Line = DelParametrVivaldi_Run("--RFCLP=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
+                
         ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
         NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
     EndIf
@@ -588,33 +598,42 @@ Procedure RunVIVALDI()
         End
     Else
         Command_Line=Command_Line_Vivaldi_Run+" "+Command_Line
-        
-        
+                
         ; проверяем наличие в параметрах коммандной строки параметра --REBSV 
         ; (--REBSV - запуск произвольного исполняемого файла перед стартом VIVALDI)
         ParametrREBSV=CheckParametr(Command_Line, "--REBSV=(["+Chr(34)+"])(\\?.)*?\1")
         If ParametrREBSV<>""
             CreateRegularExpression(4, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
             ExtractRegularExpression(4, ParametrREBSV, ProgramTo())
+            FreeRegularExpression(4)
             Program=RunProgram(ProgramTo(0),"","", #PB_Program_Open)
             If Program=0
                 MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramTo(0), #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             EndIf
             ; удаляем параметр --REBSV
-            Command_Line = ReplaceRegularExpression(3, Command_Line, " ")
-            FreeRegularExpression(4)
+            Command_Line = DelParametrVivaldi_Run("--REBSV=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
         EndIf
-                
+        
+        ; проверяем наличие в параметрах коммандной строки параметра --REBEV 
+        ; (--REBEV - запуск произвольного исполняемого файла после закрытия VIVALDI)
+        ParametrREBEV=CheckParametr(Command_Line, "--REBEV=(["+Chr(34)+"])(\\?.)*?\1")
+        If ParametrREBEV<>""
+            CreateRegularExpression(4, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
+            ExtractRegularExpression(4, ParametrREBEV, ProgramTo())
+            FreeRegularExpression(4)
+            VivaldiExitRunFile=ProgramTo(0)
+            ; удаляем параметр --REBEV
+            Command_Line = DelParametrVivaldi_Run("--REBEV=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
+        EndIf
+                        
         ; проверяем наличие в параметрах коммандной строки параметра мини режима  --OSWVCL
         ParametrOSWVCL=CheckParametr(Command_Line, "--OSWVCL")
-        If ParametrREBSV<>""
-            ; удаляем параметр --OSWVCL
-            CreateRegularExpression(3, "--OSWVCL")
-            Command_Line = ReplaceRegularExpression(3, Command_Line, " ") 
-            FreeRegularExpression(3)
-            ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
+        If ParametrOSWVCL<>"" ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
+            ; удаляем параметр --OSWVCL из параметров командной строки VIVALDI
+            Command_Line = DelParametrVivaldi_Run("--OSWVCL", Command_Line)
+            ;запускаем VIVALDI
             LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
-            End
+            End ; закрываем Vivaldi_Run
         EndIf  
         
         ; запускаем VIVALDI
@@ -631,7 +650,8 @@ EndProcedure
 
 ; Процедура проверки наличия и ожидания окон VIVALDI
 Procedure VivaldiWndEnumWait()
-    Protected counter=0, hWnd=0
+    Protected counter=0, hWnd=0, Program=0
+     
     Repeat 
         Sleep_(0)
         hWnd=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "N")
@@ -642,6 +662,13 @@ Procedure VivaldiWndEnumWait()
             Break    
         EndIf
         If counter=3000 
+            If VivaldiExitRunFile<>""
+                ;запуск исполняемого файла заданного в параметре командной строки --REBEV  
+                Program=RunProgram(VivaldiExitRunFile,"","", #PB_Program_Open)
+                If Program=0
+                    MessageRequester("Vivaldi_Run", "Failed to open the file: "+VivaldiExitRunFile, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+                EndIf
+            EndIf
             End ; завершаем Vivaldi_Run
         EndIf
     ForEver
@@ -909,8 +936,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 485
-; FirstLine = 87
-; Folding = IAQg
+; CursorPosition = 925
+; FirstLine = 104
+; Folding = AAAA-
 ; EnableXP
 ; CompileSourceDirectory
