@@ -8,7 +8,7 @@ XIncludeFile "NQIP.pbi"
 
 ; ////////////////// Глобальные переменные и константы ////////////////////////////
 
-; глобальная переменная c с именем исполняемого файла запускаемым при закрытии VIVALDI
+; глобальная переменная с именем исполняемого файла запускаемым при закрытии VIVALDI
 Global VivaldiExitRunFile.s=""
 
 ; глобальная переменная о состоянии автоскрытия панели задач. с которым был запущен VIVALDI
@@ -484,6 +484,15 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
     EndIf
 EndProcedure
 
+; Процедура запуска ярлыка WINDOWS
+Procedure LaunchingWindowsShortcut(ShortcutName.s)
+    If FileSize("BLACK_LIST_URL.txt") < 0
+        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ShortcutName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+    Else
+        RunProgram(ShortcutName,"","", #PB_Program_Open)       
+    EndIf
+EndProcedure
+
 ; Процедура удаления параметра коммандной строки Vivaldi_Run из командной строки VIVALDI
 Procedure.s DelParametrVivaldi_Run(Parametr.s, Command_Line.s)
     Protected CommandLine.s=""
@@ -712,11 +721,11 @@ Procedure OpenURLinVivaldiForegroundWindow(URL.s)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
-; Процедура получения и применения виртуальных кодов клавиш
+; Процедура применения виртуальных кодов клавиш
 Procedure KodeKey(KeyboardShortcut.s)
     ; Возвращает: 1 - если коды клавиш извлечены и эмуляция нажатий клавиш произведена.
     Protected hWndDevTool, CountKodeKey, CountCommandLineParameters, ClipboardText.s
-    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0)
+    Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0), Dim WindowsShortcut.s(0)
     
         CreateRegularExpression(1, "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")
         If MatchRegularExpression(1, KeyboardShortcut)
@@ -763,7 +772,7 @@ Procedure KodeKey(KeyboardShortcut.s)
                     ; Переход на стартовую страницу VIVALDI в текущей вкладке
                     VivaldiClipboardAddress("vivaldi://startpage")
                 ElseIf Val(VirtKeyCode(0))=11
-                    ; Реализация кнопки запуска программ WINDOWS
+                    ; Реализация команды запуска программ WINDOWS
                     If TrigerAutoHide=1
                         TrayWndAutoHide(0)
                     EndIf    
@@ -775,6 +784,15 @@ Procedure KodeKey(KeyboardShortcut.s)
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
                     EndIf
                     FreeRegularExpression(2)
+                ElseIf Val(VirtKeyCode(0))=26
+                    ; Реализация команды запуска ярлыков WINDOWS
+                    If TrigerAutoHide=1
+                        TrayWndAutoHide(0)
+                    EndIf    
+                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    ExtractRegularExpression(2, KeyboardShortcut, WindowsShortcut())
+                    LaunchingWindowsShortcut(Chr(34)+WindowsShortcut(0)+Chr(34))
+                    FreeRegularExpression(2)    
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
@@ -816,7 +834,7 @@ Procedure KodeKey(KeyboardShortcut.s)
     ProcedureReturn 1 
 EndProcedure
 
-; Процедура получения и применения виртуальных кодов клавиш от VIVALDI
+; Процедура получения виртуальных кодов клавиш от VIVALDI
 Procedure VivaldiKodeKey(Class.s, TextTitleRegExp.s)
 ; Проверяет существование активного окна с задаными классом и именем
     ; извлекает из имени окна коды виртуальных клавиш и эмулирует их нажатие для найденного окна 
@@ -936,8 +954,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 925
-; FirstLine = 104
-; Folding = AAAA-
+; CursorPosition = 943
+; FirstLine = 113
+; Folding = AAQA+
 ; EnableXP
 ; CompileSourceDirectory
