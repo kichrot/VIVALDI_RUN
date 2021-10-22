@@ -784,15 +784,6 @@ Procedure KodeKey(KeyboardShortcut.s)
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
                     EndIf
                     FreeRegularExpression(2)
-                ElseIf Val(VirtKeyCode(0))=26
-                    ; Реализация команды запуска ярлыков WINDOWS
-                    If TrigerAutoHide=1
-                        TrayWndAutoHide(0)
-                    EndIf    
-                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, KeyboardShortcut, WindowsShortcut())
-                    LaunchingWindowsShortcut(Chr(34)+WindowsShortcut(0)+Chr(34))
-                    FreeRegularExpression(2)    
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
@@ -954,8 +945,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 943
-; FirstLine = 107
-; Folding = AAAA+
+; CursorPosition = 924
+; FirstLine = 104
+; Folding = AAAA-
 ; EnableXP
 ; CompileSourceDirectory
