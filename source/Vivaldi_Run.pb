@@ -480,16 +480,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
                 EndIf
             Until hWnd=0
             Count=Count+1
-        Until hWndProg=1 Or Count=1000       
-    EndIf
-EndProcedure
-
-; Процедура запуска ярлыка WINDOWS
-Procedure LaunchingWindowsShortcut(ShortcutName.s)
-    Protected Shortcut
-    Shortcut=RunProgram(ShortcutName,"","", #PB_Program_Open)
-    If Shortcut=0
-        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ShortcutName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        Until hWndProg=1 Or Count=300       
     EndIf
 EndProcedure
 
