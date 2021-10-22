@@ -486,10 +486,10 @@ EndProcedure
 
 ; Процедура запуска ярлыка WINDOWS
 Procedure LaunchingWindowsShortcut(ShortcutName.s)
-    If FileSize("BLACK_LIST_URL.txt") < 0
+    Protected Shortcut
+    Shortcut=RunProgram(ShortcutName,"","", #PB_Program_Open)
+    If Shortcut=0
         MessageRequester("Vivaldi_Run", "Failed to open the file: "+ShortcutName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
-    Else
-        RunProgram(ShortcutName,"","", #PB_Program_Open)       
     EndIf
 EndProcedure
 
@@ -955,7 +955,7 @@ VivaldiKodeKeyWait()
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
 ; CursorPosition = 943
-; FirstLine = 113
-; Folding = AAQA+
+; FirstLine = 107
+; Folding = AAAA+
 ; EnableXP
 ; CompileSourceDirectory
