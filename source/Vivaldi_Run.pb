@@ -437,50 +437,55 @@ Procedure SetForegroundWindow(hWnd)
     InvalidateRect_(hWnd, #Null, #True)
     
     ;запасной рабочий но костыльный вариант процедуры
-    ;     keybd_event_(18 , 0, 0, 0)
-    ;     SetForegroundWindow_(hWnd)
-    ;     Delay(70)
-    ;     keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+;         keybd_event_(18 , 0, 0, 0)
+;         SetForegroundWindow_(hWnd)
+;         Delay(70)
+;         keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
 EndProcedure  
 
-; Процедура запуска внешнего приложения WINDOWS, с выводом окна на передний план
-Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s)
-    Protected RunProgramPID, hWnd, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
+; Процедура запуска внешнего приложения WINDOWS, с возможностью принудительного вывода окна на передний план
+Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
+    Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
     Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
     If Program=0
         MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
     Else
         RunProgramPID=ProgramID(Program)
         CloseProgram(Program)
-        Repeat
-            Delay(10)
+        If Foreground="Y" Or Foreground="y"
             Repeat
-                If Flag=0
-                    hWnd = FindWindow_( 0, 0 )
-                    Flag=1
-                Else    
-                    hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-                EndIf
-                If hWnd <> 0
-                    If IsWindowVisible_(hWnd) 
-                        GetWindowThreadProcessId_(hWnd, @pid)
-                        hWndForeground=GetForegroundWindow_()
-                        If RunProgramPID=pid And hWnd<>hWndForeground
-                            SetForegroundWindow(hWnd)
-                            SetActiveWindow_(hWnd)
-                            hWndProg=1
-                            Break
-                        ElseIf RunProgramPID=pid And hWnd=hWndForeground
-                            hWndProg=1
-                            Break
-                        EndIf
+                Delay(10)
+                Repeat
+                    If Flag=0
+                        hWnd = FindWindow_( 0, 0 )
+                        Flag=1
+                    Else    
+                        hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
                     EndIf
-                Else
-                    Flag=0 
+                    If hWnd <> 0
+                        If IsWindowVisible_(hWnd) 
+                            GetWindowThreadProcessId_(hWnd, @pid)
+                            hWndForeground=GetForegroundWindow_()
+                            If RunProgramPID=pid And hWnd<>hWndForeground
+                                SetForegroundWindow(hWnd)
+                                SetActiveWindow_(hWnd)
+                                hWndProg=1
+                                Break
+                            ElseIf RunProgramPID=pid And hWnd=hWndForeground
+                                hWndProg=1
+                                Break
+                            EndIf
+                        EndIf
+                    Else
+                        Flag=0 
+                    EndIf
+                Until hWnd=0
+                Count=Count+1
+                If hWndProg=1
+                    Break
                 EndIf
-            Until hWnd=0
-            Count=Count+1
-        Until hWndProg=1 Or Count=300       
+            Until Count=1000 
+        EndIf
     EndIf
 EndProcedure
 
@@ -632,7 +637,7 @@ Procedure RunVIVALDI()
             ; удаляем параметр --OSWVCL из параметров командной строки VIVALDI
             Command_Line = DelParametrVivaldi_Run("--OSWVCL", Command_Line)
             ;запускаем VIVALDI
-            LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line)
+            LaunchingExternalProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), Command_Line, "Y")
             End ; закрываем Vivaldi_Run
         EndIf  
         
@@ -717,6 +722,7 @@ Procedure KodeKey(KeyboardShortcut.s)
     ; Возвращает: 1 - если коды клавиш извлечены и эмуляция нажатий клавиш произведена.
     Protected hWndDevTool, CountKodeKey, CountCommandLineParameters, ClipboardText.s
     Protected Dim VirtKeyCode.s(0), Dim CommandLineParameters.s(0), Dim PageAddress.s(0), Dim WindowsShortcut.s(0)
+    Protected Dim Foreground.s(0)
     
         CreateRegularExpression(1, "(?<=()"+Chr(34)+")\S(.*?)(?=()"+Chr(34)+")")
         If MatchRegularExpression(1, KeyboardShortcut)
@@ -768,13 +774,16 @@ Procedure KodeKey(KeyboardShortcut.s)
                         TrayWndAutoHide(0)
                     EndIf    
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    CreateRegularExpression(3, "(?<=()\<)\S(.*?)(?=()\>)")
                     CountCommandLineParameters=ExtractRegularExpression(2, KeyboardShortcut, CommandLineParameters())
+                    ExtractRegularExpression(3, KeyboardShortcut, Foreground())
                     If CountCommandLineParameters=1
-                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "")
+                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "", Foreground(0))
                     ElseIf  CountCommandLineParameters>1 
-                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34))   
+                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34), Foreground(0))   
                     EndIf
                     FreeRegularExpression(2)
+                    FreeRegularExpression(3)
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
@@ -936,8 +945,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 924
-; FirstLine = 104
-; Folding = AAAA-
+; CursorPosition = 438
+; FirstLine = 90
+; Folding = AAsI-
 ; EnableXP
 ; CompileSourceDirectory
