@@ -443,16 +443,19 @@ Procedure SetForegroundWindow(hWnd)
 ;         keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
 EndProcedure  
 
-; Процедура запуска внешнего приложения WINDOWS, с возможностью принудительного вывода окна на передний план
+; Процедура открытия(запуска) внешнего файла или папки, с возможностью принудительного вывода окна на передний план
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
     Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0, CountLnk=0
     Protected Dim Lnk.s(0)
     
     ; Проверяем на запуск ярлыка через имя файла программы
-    CreateRegularExpression(2, "[^"+Chr(34)+"](.*?)\.lnk")
+    CreateRegularExpression(2, "^"+Chr(34)+"(.*?)\.lnk"+Chr(34)+"$")
     CountLnk=ExtractRegularExpression(2, ProgramName, Lnk())
     FreeRegularExpression(2)
     If CountLnk>0
+        CreateRegularExpression(2, Chr(34))
+        Lnk(0) = ReplaceRegularExpression(2, Lnk(0), "")
+        FreeRegularExpression(2)
         If FileSize(Lnk(0))=-1 
             MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         Else
@@ -960,7 +963,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 948
+; CursorPosition = 951
+; FirstLine = 104
 ; Folding = AAAA-
 ; EnableXP
 ; CompileSourceDirectory
