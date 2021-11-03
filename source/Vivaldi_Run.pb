@@ -461,8 +461,24 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
         Else
             RunProgram("explorer.exe", ProgramName,"", #PB_Program_Open)
         EndIf
-    Else  
-        Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+    Else 
+        ; Проверяем на запуск ярлыка через параметры коммандной строки
+        CreateRegularExpression(2, "^"+Chr(34)+"(.*?)\.lnk"+Chr(34)+"$")
+        CountLnk=ExtractRegularExpression(2, Command_Line, Lnk())
+        FreeRegularExpression(2)
+        If CountLnk>0
+            CreateRegularExpression(2, Chr(34))
+            Lnk(0) = ReplaceRegularExpression(2, Lnk(0), "")
+            FreeRegularExpression(2)
+            If FileSize(Lnk(0))=-1 
+                MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+            Else
+                Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+            EndIf
+        Else
+            Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)   
+        EndIf   
+                    
         If Program=0
             MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         Else
@@ -963,7 +979,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 951
+; CursorPosition = 968
 ; FirstLine = 104
 ; Folding = AAAA-
 ; EnableXP
