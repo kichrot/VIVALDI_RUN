@@ -445,46 +445,60 @@ EndProcedure
 
 ; Процедура запуска внешнего приложения WINDOWS, с возможностью принудительного вывода окна на передний план
 Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
-    Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0
-    Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
-    If Program=0
-        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
-    Else
-        RunProgramPID=ProgramID(Program)
-        CloseProgram(Program)
-        If Foreground="Y" Or Foreground="y"
-            Repeat
-                Delay(10)
+    Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0, CountLnk=0
+    Protected Dim Lnk.s(0)
+    
+    ; Проверяем на запуск ярлыка через имя файла программы
+    CreateRegularExpression(2, "[^"+Chr(34)+"](.*?)\.lnk")
+    CountLnk=ExtractRegularExpression(2, ProgramName, Lnk())
+    FreeRegularExpression(2)
+    If CountLnk>0
+        If FileSize(Lnk(0))=-1 
+            MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        Else
+            RunProgram("explorer.exe", ProgramName,"", #PB_Program_Open)
+        EndIf
+    Else  
+        Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+        If Program=0
+            MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+        Else
+            RunProgramPID=ProgramID(Program)
+            CloseProgram(Program)
+            If Foreground="Y" Or Foreground="y"
                 Repeat
-                    If Flag=0
-                        hWnd = FindWindow_( 0, 0 )
-                        Flag=1
-                    Else    
-                        hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-                    EndIf
-                    If hWnd <> 0
-                        If IsWindowVisible_(hWnd) 
-                            GetWindowThreadProcessId_(hWnd, @pid)
-                            hWndForeground=GetForegroundWindow_()
-                            If RunProgramPID=pid And hWnd<>hWndForeground
-                                SetForegroundWindow(hWnd)
-                                SetActiveWindow_(hWnd)
-                                hWndProg=1
-                                Break
-                            ElseIf RunProgramPID=pid And hWnd=hWndForeground
-                                hWndProg=1
-                                Break
-                            EndIf
+                    Delay(10)
+                    Repeat
+                        If Flag=0
+                            hWnd = FindWindow_( 0, 0 )
+                            Flag=1
+                        Else    
+                            hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
                         EndIf
-                    Else
-                        Flag=0 
+                        If hWnd <> 0
+                            If IsWindowVisible_(hWnd) 
+                                GetWindowThreadProcessId_(hWnd, @pid)
+                                hWndForeground=GetForegroundWindow_()
+                                If RunProgramPID=pid And hWnd<>hWndForeground
+                                    SetForegroundWindow(hWnd)
+                                    SetActiveWindow_(hWnd)
+                                    hWndProg=1
+                                    Break
+                                ElseIf RunProgramPID=pid And hWnd=hWndForeground
+                                    hWndProg=1
+                                    Break
+                                EndIf
+                            EndIf
+                        Else
+                            Flag=0 
+                        EndIf
+                    Until hWnd=0
+                    Count=Count+1
+                    If hWndProg=1
+                        Break
                     EndIf
-                Until hWnd=0
-                Count=Count+1
-                If hWndProg=1
-                    Break
-                EndIf
-            Until Count=1000 
+                Until Count=1000 
+            EndIf
         EndIf
     EndIf
 EndProcedure
@@ -777,13 +791,14 @@ Procedure KodeKey(KeyboardShortcut.s)
                     CreateRegularExpression(3, "(?<=()\<)\S(.*?)(?=()\>)")
                     CountCommandLineParameters=ExtractRegularExpression(2, KeyboardShortcut, CommandLineParameters())
                     ExtractRegularExpression(3, KeyboardShortcut, Foreground())
+                    FreeRegularExpression(2)
+                    FreeRegularExpression(3)
                     If CountCommandLineParameters=1
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "", Foreground(0))
                     ElseIf  CountCommandLineParameters>1 
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34), Foreground(0))   
                     EndIf
-                    FreeRegularExpression(2)
-                    FreeRegularExpression(3)
+                    
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
@@ -945,8 +960,7 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 438
-; FirstLine = 90
-; Folding = AAsI-
+; CursorPosition = 948
+; Folding = AAAA-
 ; EnableXP
 ; CompileSourceDirectory
