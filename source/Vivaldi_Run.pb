@@ -145,11 +145,19 @@ Procedure CheckRun(FileName.s)
     EndIf
 EndProcedure
 
+; Процедура замены подстроки в строке
+Procedure.s ReplacementSubstringString(String.s, RegExSubstringOld.s, SubstringNew.s)
+    Protected Result.s=""
+    CreateRegularExpression(10, RegExSubstringOld)
+    Result = ReplaceRegularExpression(10, String, SubstringNew)
+    FreeRegularExpression(10)
+    ProcedureReturn Result
+EndProcedure
+
 ; Процедура чтения файла (возвращает содержимое в виде строки)
 Procedure.s LoadFromFile(File.s)
     Protected OpFile,StringFormat,String.s,Strings.s
-    CreateRegularExpression(0, "(<)(.*?)(>)")
-    If OpenFile(OpFile, File.s)   
+     If OpenFile(OpFile, File.s)   
         While Eof(OpFile) = 0              ; пока не прочли весь файл
             StringFormat = ReadStringFormat(OpFile)
             If StringFormat = #PB_Ascii
@@ -162,12 +170,10 @@ Procedure.s LoadFromFile(File.s)
             Strings = Strings+" "+String
         Wend
         CloseFile(OpFile)
-        Strings = ReplaceRegularExpression(0, Strings, " ") ; удаляем комментарии
-        FreeRegularExpression(0)
+        Strings = ReplacementSubstringString(Strings, "(<)(.*?)(>)", " ") ; удаляем комментарии
         ProcedureReturn Strings
     Else
         MessageRequester("Vivaldi_Run", "Failed to open the file: "+File, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
-        FreeRegularExpression(0)
         End ; Завершение работы программы
     EndIf
 EndProcedure 
@@ -453,9 +459,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
     CountLnk=ExtractRegularExpression(2, ProgramName, Lnk())
     FreeRegularExpression(2)
     If CountLnk>0
-        CreateRegularExpression(2, Chr(34))
-        Lnk(0) = ReplaceRegularExpression(2, Lnk(0), "")
-        FreeRegularExpression(2)
+        Lnk(0) = ReplacementSubstringString(Lnk(0), Chr(34), "")
         If FileSize(Lnk(0))=-1 
             MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         Else
@@ -467,9 +471,7 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
         CountLnk=ExtractRegularExpression(2, Command_Line, Lnk())
         FreeRegularExpression(2)
         If CountLnk>0
-            CreateRegularExpression(2, Chr(34))
-            Lnk(0) = ReplaceRegularExpression(2, Lnk(0), "")
-            FreeRegularExpression(2)
+            Lnk(0) = ReplacementSubstringString(Lnk(0), Chr(34), "")
             If FileSize(Lnk(0))=-1 
                 MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             Else
@@ -525,9 +527,7 @@ EndProcedure
 ; Процедура удаления параметра коммандной строки Vivaldi_Run из командной строки VIVALDI
 Procedure.s DelParametrVivaldi_Run(Parametr.s, Command_Line.s)
     Protected CommandLine.s=""
-    CreateRegularExpression(3, Parametr)
-    CommandLine = ReplaceRegularExpression(3, Command_Line, " ")
-    FreeRegularExpression(3)
+    CommandLine = ReplacementSubstringString(Command_Line, Parametr, " ")
     ProcedureReturn CommandLine
 EndProcedure
 
@@ -979,8 +979,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 968
-; FirstLine = 104
-; Folding = AAAA-
+; CursorPosition = 967
+; FirstLine = 107
+; Folding = AAAA+
 ; EnableXP
 ; CompileSourceDirectory
