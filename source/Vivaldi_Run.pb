@@ -427,31 +427,33 @@ EndProcedure
 
 ; Процедура принудительного вывода окна на передний план
 Procedure SetForegroundWindow(hWnd) 
-    If GetWindowLong_(hWnd, #GWL_STYLE) & #WS_MINIMIZE 
-        ShowWindow_(hWnd, #SW_MAXIMIZE) 
-        UpdateWindow_(hWnd) 
-    EndIf 
-    foregroundThreadID = GetWindowThreadProcessId_(GetForegroundWindow_(), 0) 
-    ourThreadID = GetCurrentThreadId_() 
-    If (foregroundThreadID <> ourThreadID) 
-        AttachThreadInput_(foregroundThreadID, ourThreadID, #True); 
-    EndIf 
-    SetForegroundWindow_(hWnd) 
-    If (foregroundThreadID <> ourThreadID) 
-        AttachThreadInput_(foregroundThreadID, ourThreadID, #False) 
-    EndIf   
-    InvalidateRect_(hWnd, #Null, #True)
     
-    ;запасной рабочий но костыльный вариант процедуры
-;         keybd_event_(18 , 0, 0, 0)
-;         SetForegroundWindow_(hWnd)
-;         Delay(70)
-;         keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
+    ; вариант не работающий в WINDOWS 11
+;     If GetWindowLong_(hWnd, #GWL_STYLE) & #WS_MINIMIZE 
+;         ShowWindow_(hWnd, #SW_MAXIMIZE) 
+;         UpdateWindow_(hWnd) 
+;     EndIf 
+;     foregroundThreadID = GetWindowThreadProcessId_(GetForegroundWindow_(), 0) 
+;     ourThreadID = GetCurrentThreadId_() 
+;     If (foregroundThreadID <> ourThreadID) 
+;         AttachThreadInput_(foregroundThreadID, ourThreadID, #True); 
+;     EndIf 
+;     SetForegroundWindow_(hWnd) 
+;     If (foregroundThreadID <> ourThreadID) 
+;         AttachThreadInput_(foregroundThreadID, ourThreadID, #False) 
+;     EndIf   
+;     InvalidateRect_(hWnd, #Null, #True)
+    
+    ; вариант работающий в WINDOWS 11
+    keybd_event_(18 , 0, 0, 0)
+    SetForegroundWindow_(hWnd)
+    Delay(70)
+    keybd_event_(18 , 0, #KEYEVENTF_KEYUP, 0)
 EndProcedure  
 
 ; Процедура открытия(запуска) внешнего файла или папки, с возможностью принудительного вывода окна на передний план
-Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
-    Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0, CountLnk=0
+Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s="")
+    Protected RunProgramPID, hWnd=0, pid, Flag=0, Program, hWndForeground, hWndProg=0, Count=0, CountLnk=0, CountForeground=1000
     Protected Dim Lnk.s(0)
     
     ; Проверяем на запуск ярлыка через имя файла программы
@@ -463,7 +465,8 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
         If FileSize(Lnk(0))=-1 
             MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
         Else
-            RunProgram("explorer.exe", ProgramName,"", #PB_Program_Open)
+            Program=RunProgram("explorer.exe", ProgramName,"", #PB_Program_Open)
+            CountForeground=200
         EndIf
     Else 
         ; Проверяем на запуск ярлыка через параметры коммандной строки
@@ -476,52 +479,55 @@ Procedure LaunchingExternalProgram(ProgramName.s, Command_Line.s, Foreground.s)
                 MessageRequester("Vivaldi_Run", "Shortcut file "+Lnk(0)+" not found!", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             Else
                 Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)
+                CountForeground=200
             EndIf
         Else
             Program=RunProgram(ProgramName, Command_Line,"", #PB_Program_Open)   
         EndIf   
-                    
-        If Program=0
-            MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+    EndIf            
+    If Program=0
+        MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramName, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+    Else
+        RunProgramPID=ProgramID(Program)
+        CloseProgram(Program)
+        If Foreground="N" Or Foreground="n"
+            ; не выводим окно принудительно на передний фронт
         Else
-            RunProgramPID=ProgramID(Program)
-            CloseProgram(Program)
-            If Foreground="Y" Or Foreground="y"
+            Repeat
+                Delay(10)
                 Repeat
-                    Delay(10)
-                    Repeat
-                        If Flag=0
-                            hWnd = FindWindow_( 0, 0 )
-                            Flag=1
-                        Else    
-                            hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
-                        EndIf
-                        If hWnd <> 0
-                            If IsWindowVisible_(hWnd) 
-                                GetWindowThreadProcessId_(hWnd, @pid)
-                                hWndForeground=GetForegroundWindow_()
-                                If RunProgramPID=pid And hWnd<>hWndForeground
-                                    SetForegroundWindow(hWnd)
-                                    SetActiveWindow_(hWnd)
-                                    hWndProg=1
-                                    Break
-                                ElseIf RunProgramPID=pid And hWnd=hWndForeground
-                                    hWndProg=1
-                                    Break
-                                EndIf
-                            EndIf
-                        Else
-                            Flag=0 
-                        EndIf
-                    Until hWnd=0
-                    Count=Count+1
-                    If hWndProg=1
-                        Break
+                    If Flag=0
+                        hWnd = FindWindow_( 0, 0 )
+                        Flag=1
+                    Else    
+                        hWnd = GetWindow_(hWnd, #GW_HWNDNEXT)
                     EndIf
-                Until Count=1000 
-            EndIf
+                    If hWnd <> 0
+                        If IsWindowVisible_(hWnd) 
+                            GetWindowThreadProcessId_(hWnd, @pid)
+                            hWndForeground=GetForegroundWindow_()
+                            If RunProgramPID=pid And hWnd<>hWndForeground
+                                SetForegroundWindow(hWnd)
+                                SetActiveWindow_(hWnd)
+                                hWndProg=1
+                                Break
+                            ElseIf RunProgramPID=pid And hWnd=hWndForeground
+                                hWndProg=1
+                                Break
+                            EndIf
+                        EndIf
+                    Else
+                        Flag=0 
+                    EndIf
+                Until hWnd=0
+                Count=Count+1
+                If hWndProg=1
+                    Break
+                EndIf
+            Until Count=CountForeground
         EndIf
     EndIf
+    
 EndProcedure
 
 ; Процедура удаления параметра коммандной строки Vivaldi_Run из командной строки VIVALDI
@@ -979,8 +985,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 967
-; FirstLine = 107
+; CursorPosition = 974
+; FirstLine = 105
 ; Folding = AAAA+
 ; EnableXP
 ; CompileSourceDirectory
