@@ -11,6 +11,9 @@ XIncludeFile "NQIP.pbi"
 ; глобальная переменная с именем исполняемого файла запускаемым при закрытии VIVALDI
 Global VivaldiExitRunFile.s=""
 
+; глобальная переменная с номером сборки WINDOWS
+Global WindowsAssemblyNumber=0
+
 ; глобальная переменная о состоянии автоскрытия панели задач. с которым был запущен VIVALDI
 ; 0 - автоскрытие выключено, 1 - автоскрытие включено
 Global AutoHideTrayWnd=0
@@ -54,6 +57,40 @@ Procedure OSbits()
     Else
         ProcedureReturn 32 
     EndIf
+EndProcedure
+
+; Процедура чтения значения ключа реестра WINDOWS
+Procedure.s RegRead(Root, KeyPath$, ValueName$)
+	Protected Size, ValueData$, hKey, Type
+	; Если раздел открыт успешно
+	If #ERROR_SUCCESS = RegOpenKeyEx_(Root,KeyPath$,0,#KEY_ALL_ACCESS,@hKey)
+		; Чтобы получить размер данных и тип. Размер для выделения буфера,
+		; тип для определения можно ли анализировать данные соответствующими функциями
+		If #ERROR_SUCCESS = RegQueryValueEx_(hKey,ValueName$,0,@Type,0,@Size)
+			; Debug Str(Type)
+			Select Type
+				Case 1
+					Debug "REG_SZ Строковый"
+				Case 2
+					Debug "REG_EXPAND_SZ Строковый с %Temp%"
+				Case 3
+					Debug "REG_BINARY Бинарный"
+				Case 4
+					Debug "REG_DWORD 8 байт, Double, Quad"
+				Case 7
+					Debug "REG_MULTI_SZ Многострочный текст "
+				Default
+					Debug "один из редких типов"
+			EndSelect
+			Debug "Длина данных: " + Str(Size) + " байт"
+			ValueData$=Space(Size)
+			If #ERROR_SUCCESS = RegQueryValueEx_(hKey,ValueName$,0,0,@ValueData$,@Size)
+				Debug "успешно, значение параметра " + ValueName$ + ": " + ValueData$
+			EndIf
+		EndIf
+		RegCloseKey_(hKey)
+	EndIf
+	ProcedureReturn ValueData$
 EndProcedure
 
 ; Процедура закрытия процесса по PID
@@ -545,6 +582,9 @@ Procedure RunVIVALDI()
     Protected Dim FileNameCommandLineVivaldi.s(0)
     Protected Dim ProgramTo.s(0)
     
+    ; определяем номер сборки WINDOWS и заносим в глобальную переменную WindowsAssemblyNumber
+    WindowsAssemblyNumber= Val(RegRead(#HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuildNumber"))
+    
     ; проверяем разрядность OS
     If OSbits()=32 And #PB_Compiler_Processor=#PB_Processor_x64
         MessageRequester("Vivaldi_Run", "For your OS, use the 32-bit version of Vivaldi_Run.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL) 
@@ -809,9 +849,11 @@ Procedure KodeKey(KeyboardShortcut.s)
                     VivaldiClipboardAddress("vivaldi://startpage")
                 ElseIf Val(VirtKeyCode(0))=11
                     ; Реализация команды запуска программ WINDOWS
-                    If TrigerAutoHide=1
-                        TrayWndAutoHide(0)
-                    EndIf    
+                    If WindowsAssemblyNumber<22000 ; проверяем по номеру сборки WINDOWS на отсутствие WINDOWS 11
+                        If TrigerAutoHide=1
+                            TrayWndAutoHide(0)
+                        EndIf  
+                    EndIf
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
                     CreateRegularExpression(3, "(?<=()\<)\S(.*?)(?=()\>)")
                     CountCommandLineParameters=ExtractRegularExpression(2, KeyboardShortcut, CommandLineParameters())
@@ -842,7 +884,11 @@ Procedure KodeKey(KeyboardShortcut.s)
                     ; перевод фокуса на страницу
                     KeybdEvent(100, 120)    
                     ; включение/выключение автоскрытия панели задач
-                    TrayWndAutoHide(1)
+                    If WindowsAssemblyNumber<22000 ; проверяем по номеру сборки WINDOWS на отсутствие WINDOWS 11
+                        TrayWndAutoHide(1)
+                    Else
+                        MessageRequester("Vivaldi_Run", "The taskbar auto-cover mode command for WINDOWS 11 is not supported.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)    
+                    EndIf    
                 Else
                     ; стандартные кнопки
                     KeybdEvent(50, Val(VirtKeyCode(k)))
@@ -931,17 +977,20 @@ Procedure VivaldiKodeKeyWait()
             Until count=20
             Sleep_(0)
             ; возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
-            If IsWindow_(hWnd)=0 
-                TrayWndAutoHide(0)
-                Break
-            ElseIf TrigerAutoHide=1
-                If IsZoomed_(hWnd)=0
+            
+            If WindowsAssemblyNumber<22000 ; проверяем по номеру сборки WINDOWS на отсутствие WINDOWS 11
+                If IsWindow_(hWnd)=0 
                     TrayWndAutoHide(0)
-                ElseIf GetForegroundWindow_()<>hWnd And
-                       GetForegroundWindow_()<>hWndTaskBar And
-                       WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0 And
-                       WndEnumEx("#32770", ".*", "Y")=0
-                    TrayWndAutoHide(0)
+                    Break
+                ElseIf TrigerAutoHide=1
+                    If IsZoomed_(hWnd)=0
+                        TrayWndAutoHide(0)
+                    ElseIf GetForegroundWindow_()<>hWnd And
+                           GetForegroundWindow_()<>hWndTaskBar And
+                           WndEnumEx("Chrome_WidgetWin_1", ".*", "Y")=0 And
+                           WndEnumEx("#32770", ".*", "Y")=0
+                        TrayWndAutoHide(0)
+                    EndIf
                 EndIf
             EndIf
             Sleep_(0)
@@ -985,8 +1034,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 974
-; FirstLine = 105
-; Folding = AAAA+
+; CursorPosition = 1023
+; FirstLine = 113
+; Folding = AAAA9
 ; EnableXP
 ; CompileSourceDirectory
