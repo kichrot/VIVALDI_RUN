@@ -976,11 +976,9 @@ Procedure VivaldiKodeKeyWait()
                 EndIf
             Until count=20
             Sleep_(0)
-            ; возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
-            
             If WindowsAssemblyNumber<22000 ; проверяем по номеру сборки WINDOWS на отсутствие WINDOWS 11
-                If IsWindow_(hWnd)=0 
-                    TrayWndAutoHide(0)
+                If IsWindow_(hWnd)=0       
+                    TrayWndAutoHide(0) ; возвращаем панель задач в исходное состояние, при изменении состояния окна VIVALDI
                     Break
                 ElseIf TrigerAutoHide=1
                     If IsZoomed_(hWnd)=0
@@ -992,9 +990,13 @@ Procedure VivaldiKodeKeyWait()
                         TrayWndAutoHide(0)
                     EndIf
                 EndIf
+            Else ; если WINDOWS 11
+                If IsWindow_(hWnd)=0       
+                    Break 
+                EndIf
             EndIf
             Sleep_(0)
-            ; проверяем окно VIVALDI переднем плане
+            ; проверяем окно VIVALDI на переднем плане
             If GetForegroundWindow_()<>hWndActiveWndVivaldi 
                 hWnd_New=WndEnumEx("Chrome_WidgetWin_1", "\s-\sVivaldi\Z", "Y")
                 If hWnd_New<>0
@@ -1034,8 +1036,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 1023
-; FirstLine = 113
-; Folding = AAAA9
+; CursorPosition = 991
+; FirstLine = 138
+; Folding = AAAA+
 ; EnableXP
 ; CompileSourceDirectory
