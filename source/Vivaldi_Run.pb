@@ -767,7 +767,13 @@ Procedure VivaldiClipboardAddress(Address.s)
     KeybdEvent(70, 17, 76)
     KeybdEvent(70, 46)
     KeybdEvent(70, 17, 16, 86)
-    Delay(100)
+    KeybdEvent(70, 17, 76)
+    SetClipboardText("")
+    SetClipboardText(Address)
+    Delay(200)
+    KeybdEvent(70, 17, 86)
+    Delay(2000)
+    KeybdEvent(100, 120)
     SetClipboardText("")
     SetClipboardText(ClipboardText)
     ClipboardText=""
@@ -1036,8 +1042,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 991
-; FirstLine = 138
-; Folding = AAAA+
+; CursorPosition = 1031
+; FirstLine = 113
+; Folding = AAAA9
 ; EnableXP
 ; CompileSourceDirectory
