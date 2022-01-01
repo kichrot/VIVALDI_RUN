@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2022-01-01 11:19" user="User" host="OLEG-OV"/>
+    <lastopen date="2022-01-01 13:08" user="User" host="OLEG-OV"/>
   </section>
   <section name="files">
     <file name="NQIP.pbi">
@@ -16,7 +16,7 @@
     </file>
     <file name="Vivaldi_Run.pb">
       <config load="1" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="f93e4990d5762db92e247633de98bd90"/>
+      <fingerprint md5="2cfde36c41ef77956ab635cf89d29cda"/>
     </file>
   </section>
   <section name="targets">
