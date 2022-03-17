@@ -892,7 +892,14 @@ Procedure KodeKey(KeyboardShortcut.s)
                         TrayWndAutoHide(1)
                     Else
                         MessageRequester("Vivaldi_Run", "The taskbar auto-cover mode command for WINDOWS 11 is not supported.", #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)    
-                    EndIf    
+                    EndIf 
+                ElseIf Val(VirtKeyCode(0))=26
+                    ; команда задержки в милисекундах
+                    Protected Dim ComDelay.s(0)
+                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
+                    ExtractRegularExpression(2, KeyboardShortcut, ComDelay())
+                    Delay(Val(ComDelay(0)))
+                    FreeRegularExpression(2)
                 Else
                     ; стандартные кнопки
                     KeybdEvent(50, Val(VirtKeyCode(k)))
@@ -1040,8 +1047,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 1029
-; FirstLine = 113
+; CursorPosition = 901
+; FirstLine = 99
 ; Folding = AAAA9
 ; EnableXP
 ; CompileSourceDirectory
