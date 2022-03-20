@@ -800,6 +800,16 @@ Procedure OpenURLinVivaldiForegroundWindow(URL.s)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
+; Процедура применения регулярного выражения к строке
+Procedure.s ReturnResultRegExp(String.s, RegExp.s)
+    ; возвращает первую строку соответствующую регулярному выражению RegExp из строки String
+    Protected Dim ReturnRegExp.s(0)
+    CreateRegularExpression(10, RegExp)
+    ExtractRegularExpression(10, String, ReturnRegExp())
+    FreeRegularExpression(10)
+    ProcedureReturn ReturnRegExp(0)
+EndProcedure 
+
 ; Процедура применения виртуальных кодов клавиш
 Procedure KodeKey(KeyboardShortcut.s)
     ; Возвращает: 1 - если коды клавиш извлечены и эмуляция нажатий клавиш произведена.
@@ -859,13 +869,10 @@ Procedure KodeKey(KeyboardShortcut.s)
                         EndIf  
                     EndIf
                     CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    CreateRegularExpression(3, "(?<=()\<)\S(.*?)(?=()\>)")
                     CountCommandLineParameters=ExtractRegularExpression(2, KeyboardShortcut, CommandLineParameters())
-                    ExtractRegularExpression(3, KeyboardShortcut, Foreground())
                     FreeRegularExpression(2)
-                    FreeRegularExpression(3)
                     If CountCommandLineParameters=1
-                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "", Foreground(0))
+                        LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), "", ReturnResultRegExp(KeyboardShortcut, "(?<=()\<)\S(.*?)(?=()\>)"))
                     ElseIf  CountCommandLineParameters>1 
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34), Foreground(0))   
                     EndIf
@@ -873,17 +880,11 @@ Procedure KodeKey(KeyboardShortcut.s)
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
-                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, KeyboardShortcut, PageAddress())
                     Delay(100)
-                    VivaldiClipboardAddress(PageAddress(0))
-                    FreeRegularExpression(2)
+                    VivaldiClipboardAddress(ReturnResultRegExp(KeyboardShortcut, "(?<=()\|)\S(.*?)(?=()\|)"))
                 ElseIf Val(VirtKeyCode(0))=15
                     ; Открытие страницы, по заданному адресу, в новой вкладке
-                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, KeyboardShortcut, PageAddress())
-                    OpenURLinVivaldiForegroundWindow(PageAddress(0))
-                    FreeRegularExpression(2)
+                    OpenURLinVivaldiForegroundWindow(ReturnResultRegExp(KeyboardShortcut, "(?<=()\|)\S(.*?)(?=()\|)"))
                 ElseIf Val(VirtKeyCode(0))=22
                     ; перевод фокуса на страницу
                     KeybdEvent(100, 120)    
@@ -895,11 +896,7 @@ Procedure KodeKey(KeyboardShortcut.s)
                     EndIf 
                 ElseIf Val(VirtKeyCode(0))=26
                     ; команда задержки в милисекундах
-                    Protected Dim ComDelay.s(0)
-                    CreateRegularExpression(2, "(?<=()\|)\S(.*?)(?=()\|)")
-                    ExtractRegularExpression(2, KeyboardShortcut, ComDelay())
-                    Delay(Val(ComDelay(0)))
-                    FreeRegularExpression(2)
+                    Delay(Val(ReturnResultRegExp(KeyboardShortcut, "(?<=()\|)\S(.*?)(?=()\|)")))
                 Else
                     ; стандартные кнопки
                     KeybdEvent(50, Val(VirtKeyCode(k)))
@@ -1047,8 +1044,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 901
-; FirstLine = 99
-; Folding = AAAA9
+; CursorPosition = 1033
+; FirstLine = 117
+; Folding = AAAA5
 ; EnableXP
 ; CompileSourceDirectory
