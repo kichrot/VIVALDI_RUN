@@ -574,13 +574,22 @@ Procedure.s DelParametrVivaldi_Run(Parametr.s, Command_Line.s)
     ProcedureReturn CommandLine
 EndProcedure
 
+; Процедура применения регулярного выражения к строке
+Procedure.s ReturnResultRegExp(String.s, RegExp.s)
+    ; возвращает первую строку соответствующую регулярному выражению RegExp из строки String
+    Protected Dim ReturnRegExp.s(0)
+    CreateRegularExpression(10, RegExp)
+    ExtractRegularExpression(10, String, ReturnRegExp())
+    FreeRegularExpression(10)
+    ProcedureReturn ReturnRegExp(0)
+EndProcedure 
+
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
     Protected Command_Line.s="", Command_Line_Vivaldi_Run.s=""
     Protected ParametrRFCLP.s="", ParametrREBSV.s="", ParametrREBEV.s="", ParametrOSWVCL.s="", Program=0
     Protected Dim ParamVivaldi_Run.s(0)
-    Protected Dim FileNameCommandLineVivaldi.s(0)
-    Protected Dim ProgramTo.s(0)
+    Protected ProgramTo.s=""
     
     ; определяем номер сборки WINDOWS и заносим в глобальную переменную WindowsAssemblyNumber
     WindowsAssemblyNumber= Val(RegRead(#HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuildNumber"))
@@ -657,15 +666,10 @@ Procedure RunVIVALDI()
     ; параметр указывающий имя файла с параметрами запуска VIVALDI вместо стандартного VIVALDI_COMMAND_LINE.txt
     ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
     If ParametrRFCLP<>""
-        CreateRegularExpression(3, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
-        ExtractRegularExpression(3, ParametrRFCLP, FileNameCommandLineVivaldi())
-        FreeRegularExpression(3)
-        
+        ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
+        NameFileCommandLineVivaldi=ReturnResultRegExp(ParametrRFCLP, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
         ; удаляем параметр --RFCLP
         Command_Line = DelParametrVivaldi_Run("--RFCLP=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
-                
-        ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
-        NameFileCommandLineVivaldi=FileNameCommandLineVivaldi(0)
     EndIf
     
     ; Проверяем наличие файла с именем из глобальной переменной NameFileCommandLineVivaldi
@@ -687,12 +691,10 @@ Procedure RunVIVALDI()
         ; (--REBSV - запуск произвольного исполняемого файла перед стартом VIVALDI)
         ParametrREBSV=CheckParametr(Command_Line, "--REBSV=(["+Chr(34)+"])(\\?.)*?\1")
         If ParametrREBSV<>""
-            CreateRegularExpression(4, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
-            ExtractRegularExpression(4, ParametrREBSV, ProgramTo())
-            FreeRegularExpression(4)
-            Program=RunProgram(ProgramTo(0),"","", #PB_Program_Open)
+            ProgramTo=ReturnResultRegExp(ParametrREBSV, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
+            Program=RunProgram(ProgramTo,"","", #PB_Program_Open)
             If Program=0
-                MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramTo(0), #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
+                MessageRequester("Vivaldi_Run", "Failed to open the file: "+ProgramTo, #MB_OK|#MB_ICONERROR|#MB_SYSTEMMODAL)
             EndIf
             ; удаляем параметр --REBSV
             Command_Line = DelParametrVivaldi_Run("--REBSV=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
@@ -702,10 +704,8 @@ Procedure RunVIVALDI()
         ; (--REBEV - запуск произвольного исполняемого файла после закрытия VIVALDI)
         ParametrREBEV=CheckParametr(Command_Line, "--REBEV=(["+Chr(34)+"])(\\?.)*?\1")
         If ParametrREBEV<>""
-            CreateRegularExpression(4, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
-            ExtractRegularExpression(4, ParametrREBEV, ProgramTo())
-            FreeRegularExpression(4)
-            VivaldiExitRunFile=ProgramTo(0)
+            ProgramTo=ReturnResultRegExp(ParametrREBEV, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
+            VivaldiExitRunFile=ProgramTo
             ; удаляем параметр --REBEV
             Command_Line = DelParametrVivaldi_Run("--REBEV=(["+Chr(34)+"])(\\?.)*?\1", Command_Line)
         EndIf
@@ -800,16 +800,6 @@ Procedure OpenURLinVivaldiForegroundWindow(URL.s)
     RunProgram(Chr(34)+GetCurrentDirectory()+"vivaldi.exe"+Chr(34), URL+" "+CommandLine,"", #PB_Program_Open)
 EndProcedure    
 
-; Процедура применения регулярного выражения к строке
-Procedure.s ReturnResultRegExp(String.s, RegExp.s)
-    ; возвращает первую строку соответствующую регулярному выражению RegExp из строки String
-    Protected Dim ReturnRegExp.s(0)
-    CreateRegularExpression(10, RegExp)
-    ExtractRegularExpression(10, String, ReturnRegExp())
-    FreeRegularExpression(10)
-    ProcedureReturn ReturnRegExp(0)
-EndProcedure 
-
 ; Процедура применения виртуальных кодов клавиш
 Procedure KodeKey(KeyboardShortcut.s)
     ; Возвращает: 1 - если коды клавиш извлечены и эмуляция нажатий клавиш произведена.
@@ -876,7 +866,6 @@ Procedure KodeKey(KeyboardShortcut.s)
                     ElseIf  CountCommandLineParameters>1 
                         LaunchingExternalProgram(Chr(34)+CommandLineParameters(0)+Chr(34), Chr(34)+CommandLineParameters(1)+Chr(34), Foreground(0))   
                     EndIf
-                    
                 ElseIf Val(VirtKeyCode(0))=14
                     ; Открытие страницы, по заданному адресу, в текущей вкладке
                     ClipboardText=GetClipboardText()
@@ -914,7 +903,6 @@ Procedure KodeKey(KeyboardShortcut.s)
             FreeRegularExpression(1)
             ProcedureReturn 0   
         EndIf   
-    
     FreeRegularExpression(1)
     ProcedureReturn 1 
 EndProcedure
@@ -1044,8 +1032,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 1033
-; FirstLine = 117
+; CursorPosition = 1021
+; FirstLine = 108
 ; Folding = AAAA5
 ; EnableXP
 ; CompileSourceDirectory
