@@ -151,25 +151,27 @@ Procedure KillProcessSecondVivaldi_Run(Name.s="Vivaldi_Run.exe")
     ;ProcedureReturn ret
 EndProcedure
 
-; Проверяем наличие в параметрах коммандной строки параметра управления Vivaldi_Run
-Procedure.s CheckParametr(Command_Line.s, Parametr.s)
-    Protected Dim ParamVivaldi_Run.s(0)
-    CreateRegularExpression(3, Parametr)
-    CountParamVivaldi_Run=ExtractRegularExpression(3, Command_Line, ParamVivaldi_Run())
-    If CountParamVivaldi_Run>0
-        ProcedureReturn ParamVivaldi_Run(0)
+; Процедура применения регулярного выражения к строке
+Procedure.s ReturnResultRegExp(String.s, RegExp.s)
+    ; возвращает первую строку соответствующую регулярному выражению RegExp из строки String
+    Protected Dim ReturnRegExp.s(0)
+    Protected Count=0 
+    CreateRegularExpression(10, RegExp)
+    Count=ExtractRegularExpression(10, String, ReturnRegExp())
+    FreeRegularExpression(10)
+    If Count>0
+        ProcedureReturn ReturnRegExp(0)
     Else
-       ProcedureReturn ""
-   EndIf  
-   FreeRegularExpression(3)
-EndProcedure
+        ProcedureReturn ""
+    EndIf  
+EndProcedure 
     
 ; Процедура проверки повторного запуска Vivaldi_Run
 Procedure CheckRun(FileName.s) 
     Protected Command_Line_Vivaldi_Run.s, ParametrRFCLP.s=""
     ; Получаем параметры командной строки для файла Vivaldi_Run.exe
     Command_Line_Vivaldi_Run=Trim(Mid(PeekS(GetCommandLine_()), Len(ProgramFilename())+3))
-    ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
+    ParametrRFCLP=ReturnResultRegExp(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
     *a = CreateSemaphore_(0, 0, 1, FileName)
     If *a <> 0 And GetLastError_()= #ERROR_ALREADY_EXISTS
         CloseHandle_(*a)
@@ -574,16 +576,6 @@ Procedure.s DelParametrVivaldi_Run(Parametr.s, Command_Line.s)
     ProcedureReturn CommandLine
 EndProcedure
 
-; Процедура применения регулярного выражения к строке
-Procedure.s ReturnResultRegExp(String.s, RegExp.s)
-    ; возвращает первую строку соответствующую регулярному выражению RegExp из строки String
-    Protected Dim ReturnRegExp.s(0)
-    CreateRegularExpression(10, RegExp)
-    ExtractRegularExpression(10, String, ReturnRegExp())
-    FreeRegularExpression(10)
-    ProcedureReturn ReturnRegExp(0)
-EndProcedure 
-
 ; Процедура запуска VIVALDI
 Procedure RunVIVALDI()
     Protected Command_Line.s="", Command_Line_Vivaldi_Run.s=""
@@ -664,7 +656,7 @@ Procedure RunVIVALDI()
     
     ; ищем вкомандной строке Vivaldi_Run параметр --RFCLP
     ; параметр указывающий имя файла с параметрами запуска VIVALDI вместо стандартного VIVALDI_COMMAND_LINE.txt
-    ParametrRFCLP=CheckParametr(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
+    ParametrRFCLP=ReturnResultRegExp(Command_Line_Vivaldi_Run, "--RFCLP=(["+Chr(34)+"])(\\?.)*?\1")
     If ParametrRFCLP<>""
         ; Меняем значение глобальной переменной с именем файла содержащим параметры командной строки VIVALDI
         NameFileCommandLineVivaldi=ReturnResultRegExp(ParametrRFCLP, "(?<=()\"+Chr(34)+")\S(.*?)(?=()\"+Chr(34)+")")
@@ -689,7 +681,7 @@ Procedure RunVIVALDI()
                 
         ; проверяем наличие в параметрах коммандной строки параметра --REBSV 
         ; (--REBSV - запуск произвольного исполняемого файла перед стартом VIVALDI)
-        ParametrREBSV=CheckParametr(Command_Line, "--REBSV=(["+Chr(34)+"])(\\?.)*?\1")
+        ParametrREBSV=ReturnResultRegExp(Command_Line, "--REBSV=(["+Chr(34)+"])(\\?.)*?\1")
         If ParametrREBSV<>""
             ProgramTo=ReturnResultRegExp(ParametrREBSV, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
             Program=RunProgram(ProgramTo,"","", #PB_Program_Open)
@@ -702,7 +694,7 @@ Procedure RunVIVALDI()
         
         ; проверяем наличие в параметрах коммандной строки параметра --REBEV 
         ; (--REBEV - запуск произвольного исполняемого файла после закрытия VIVALDI)
-        ParametrREBEV=CheckParametr(Command_Line, "--REBEV=(["+Chr(34)+"])(\\?.)*?\1")
+        ParametrREBEV=ReturnResultRegExp(Command_Line, "--REBEV=(["+Chr(34)+"])(\\?.)*?\1")
         If ParametrREBEV<>""
             ProgramTo=ReturnResultRegExp(ParametrREBEV, "(?<=()\"+Chr(34)+")(.*?)(?=()\"+Chr(34)+")")
             VivaldiExitRunFile=ProgramTo
@@ -711,7 +703,7 @@ Procedure RunVIVALDI()
         EndIf
                         
         ; проверяем наличие в параметрах коммандной строки параметра мини режима  --OSWVCL
-        ParametrOSWVCL=CheckParametr(Command_Line, "--OSWVCL")
+        ParametrOSWVCL=ReturnResultRegExp(Command_Line, "--OSWVCL")
         If ParametrOSWVCL<>"" ; если параметр --OSWVCL присутсттвует, то запускаем VIVALDI и прекращаем работу "Vivaldi_Run"
             ; удаляем параметр --OSWVCL из параметров командной строки VIVALDI
             Command_Line = DelParametrVivaldi_Run("--OSWVCL", Command_Line)
@@ -1032,8 +1024,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 1021
-; FirstLine = 108
-; Folding = AAAA5
+; CursorPosition = 1013
+; FirstLine = 105
+; Folding = AAAA9
 ; EnableXP
 ; CompileSourceDirectory
