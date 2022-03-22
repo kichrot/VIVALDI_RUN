@@ -1,7 +1,7 @@
 ﻿; * Утилита для браузера VIVALDI / Vivaldi browser utility
 ; * автор / author: kichrot
 ; * https://forum.vivaldi.net/topic/43971/vivaldi_run-utility-windows-only
-; * 2021 year 
+; * 2022 year 
 
 XIncludeFile "NQIP.pbi"
 
@@ -160,7 +160,7 @@ Procedure.s ReturnResultRegExp(String.s, RegExp.s)
     Count=ExtractRegularExpression(10, String, ReturnRegExp())
     FreeRegularExpression(10)
     If Count>0
-        ProcedureReturn ReturnRegExp(0)
+        ProcedureReturn Trim(ReturnRegExp(0))
     Else
         ProcedureReturn ""
     EndIf  
@@ -771,21 +771,13 @@ EndProcedure
 
 ; Процедура открытия URL  в новой вкладке текщего активного окна VIVALDI
 Procedure OpenURLinVivaldiForegroundWindow(URL.s)
-    Protected ProcessId=0, CommandLine.s="", PathProfileParam=0
-    Protected Dim ParamPathProfile.s(0)
+    Protected ProcessId=0, CommandLine.s=""
     GetWindowThreadProcessId_(GetForegroundWindow_(), @ProcessId)
     If ProcessId=PidActiveWndVivaldi
         CommandLine=ParamProfileActiveWndVivaldi
     Else
         CommandLine=NQIP_GetCommandLine(ProcessId)
-        CreateRegularExpression(4, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
-        PathProfileParam=ExtractRegularExpression(4, CommandLine, ParamPathProfile())
-        If PathProfileParam>0
-            CommandLine=Trim(ParamPathProfile(0))
-        Else
-            CommandLine=""
-        EndIf
-        FreeRegularExpression(4)
+        CommandLine=ReturnResultRegExp(CommandLine, "--user-data-dir=("+Chr(34)+")(.*?)("+Chr(34)+")")
         PidActiveWndVivaldi=ProcessId
         ParamProfileActiveWndVivaldi=CommandLine
     EndIf
@@ -1024,8 +1016,8 @@ VivaldiKodeKeyWait()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x86)
-; CursorPosition = 1013
-; FirstLine = 105
+; CursorPosition = 1005
+; FirstLine = 114
 ; Folding = AAAA9
 ; EnableXP
 ; CompileSourceDirectory
